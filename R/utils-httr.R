@@ -22,7 +22,7 @@ catch_errors <- function(x, retry=TRUE){
         if(x$request$options$post){
           x <- POST(x$request$url, 
                     add_headers(x$request$headers),
-                    body = rawToChar(httr_response$request$options$postfields))
+                    body = rawToChar(x$request$options$postfields))
         } else {
           message(sprintf("%s: %s", error_code, error_text))
           stop()

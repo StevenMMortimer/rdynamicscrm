@@ -4,7 +4,7 @@
 #' 
 #' @importFrom httr POST content
 #' @importFrom purrr map_df
-#' @importFrom XML newXMLNode setXMLNamespace xmlInternalTreeParse xmlChildren addChildren getNodeSet xmlValue saveXML
+#' @importFrom XML newXMLNode setXMLNamespace xmlInternalTreeParse xmlChildren addChildren getNodeSet xmlValue<- saveXML
 #' @importFrom xml2 xml_ns_strip xml_find_all as_list
 #' @return \code{tibble} containing user information
 #' @examples
