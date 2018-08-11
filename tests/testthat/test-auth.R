@@ -1,6 +1,6 @@
 context("Authorization")
 
-rdynamicscrm_setup <- readRDS("rdynamics_setup.rds")
+rdynamicscrm_setup <- readRDS("rdynamicscrm_setup.rds")
 
 test_that("testing happy path auth", {
   
