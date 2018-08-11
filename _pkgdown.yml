@@ -1,0 +1,49 @@
+title: rdynamicscrm
+url: https://stevenmmortimer.github.io/rdynamicscrm
+template:
+  params:
+    bootswatch: spacelab
+    ganalytics: UA-98603021-2
+
+home:
+  strip_header: true
+  
+navbar:
+  type: default
+  left:
+    - text: "Articles"
+      icon: fas fa-book
+      menu: 
+      -  text: Getting Started
+         href: articles/getting-started.html
+    - text: Reference
+      icon: fa-file-code-o
+      href: reference/index.html
+    - text: News
+      icon: fa-newspaper-o
+      href: news/index.html
+  right:
+    - text: GitHub
+      icon: fa-github fa-lg
+      href: https://github.com/StevenMMortimer/rdynamicscrm
+      
+reference:
+  - title: Authentication
+    desc: Functions used for authenticating
+    contents:
+      - '`dyn_auth`'
+  - title: Query Function
+    desc: Function used for querying (aka fetching)
+    contents:
+      - '`dyn_query`'
+  - title: CRUD Functions
+    desc: Functions used for create, retrieve, update, and delete records
+    contents:
+      - '`dyn_create`'
+      - '`dyn_retrieve`'
+      - '`dyn_update`'
+      - '`dyn_delete`'
+  - title: MS Dynamics CRM Utility Functions
+    desc: Functions used for basic calls to understand the organization
+    contents:
+      - '`dyn_user_info`'

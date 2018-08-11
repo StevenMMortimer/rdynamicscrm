@@ -1,0 +1,40 @@
+Package: rdynamicscrm
+Title: An implementation of a 'MS Dynamics CRM' client
+Version: 0.0.0.9000
+Date: 2018-08-11
+Description: An implementation of a 'MS Dynamics CRM' client. Microsoft Dynamics 
+    CRM is a customer relationship management (CRM) software package developed by 
+    Microsoft <https://dynamics.microsoft.com/en-us/>. This package is an articulation 
+    of SOAP API calls to a CRM Online and On Premise IFD environment. For more details 
+    please see the 'MS Dynamics CRM' documentation <https://docs.microsoft.com/en-us/dynamics365/customer-engagement/developer/use-microsoft-dynamics-365-organization-service> 
+    and this package's website <https://stevenmmortimer.github.io/rdynamicscrm/> 
+    for more information, documentation, and examples.
+Authors@R: c(
+    person(c("Steven", "M."), "Mortimer", , "reportmort@gmail.com", c("aut", "cre"))
+    )
+URL: https://github.com/StevenMMortimer/rdynamicscrm
+BugReports: https://github.com/StevenMMortimer/rdynamicscrm/issues
+Encoding: UTF-8
+Depends:
+    R (>= 3.1.0)
+License: MIT + file LICENSE
+LazyData: true
+Imports:
+    methods,
+    httr,
+    purrr,
+    dplyr,
+    tidyr,
+    xml2,
+    XML,
+    digest,
+    base64enc,
+    uuid
+Suggests:
+    knitr,
+    testthat,
+    rmarkdown,
+    here,
+    lubridate
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1

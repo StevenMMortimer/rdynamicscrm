@@ -1,0 +1,116 @@
+---
+title: "Getting Started"
+author: "Steven M. Mortimer"
+date: "2018-08-11"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 4
+    keep_md: true
+vignette: >
+  %\VignetteIndexEntry{Getting Started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = FALSE}
+NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")), "true")
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  purl = NOT_CRAN,
+  eval = NOT_CRAN
+)
+```
+
+First, load the **rdynamicscrm** package and authenticate.
+
+```{r auth, include = FALSE}
+suppressWarnings(suppressMessages(library(dplyr)))
+suppressWarnings(suppressMessages(library(here)))
+library(rdynamicscrm)
+rdynamicscrm_setup <- readRDS(here::here("tests", "testthat", "rdynamicscrm_setup.rds"))
+suppressMessages(dyn_auth(url = rdynamicscrm_setup$url, 
+                          username = rdynamicscrm_setup$username, 
+                          password = rdynamicscrm_setup$password))
+```
+
+```{r load-package, eval=FALSE}
+suppressWarnings(suppressMessages(library(dplyr)))
+library(rdynamicscrm)
+dyn_auth(url = "https://test.ztcrm.org/",
+         username = "test@live.com", 
+         password = "{PASSWORD_HERE}")
+```
+
+After authenticating you can check your connectivity by looking at the information 
+returned about the current user. It should be information about you!
+
+```{r}
+# pull down information of person logged in
+# it's a simple easy call to get started 
+# and confirm a connection to the APIs
+user_info <- dyn_whoami()
+sprintf("Name: %s %s", user_info$firstname, user_info$lastname)
+sprintf("User Active?: %s", user_info$isactive)
+```
+
+### Create
+
+MS Dynamics CRM has entities and those entities contain records. One default entity is the 
+"Account" entity. This example shows how to create two records in the Account entity.
+
+```{r create-records}
+n <- 2
+new_accounts <- tibble(FirstName = rep("Test", n),
+                       LastName = paste0("Account-Create-", 1:n))
+created_records <- dyn_create(new_accounts, entity_name="Account")
+created_records
+```
+
+### Query
+
+MS Dynamics CRM has proprietary form of SQL called FetchXML. FetchXML is a powerful 
+tool that allows you to return the attributes of records on almost any entity in 
+MS Dynamics CRM including Accounts, Contacts, custom entities and more! Below is an 
+example where we grab the two Account records we just created.
+
+```{r query-records}
+queried_records <- dyn_query(entity - "account")
+queried_records
+
+# example using raw FetchXML
+queried_records <- dyn_query(fetchxml = my_fetchxml)
+queried_records
+```
+
+### Update
+
+After creating records you can update them using `dyn_update()`. Updating a record 
+requires you to pass the MS Dynamics CRM `Id` of the record. MS Dynamics CRM creates 
+a GUID (globally unique identifier) on each record and uses that to know which record to 
+attach the update information you provide. Simply include a field or column in your 
+update dataset called "Id" and the information will be matched. Here is an example 
+where we update each of the records we created earlier with a new first name 
+called "TestTest".
+
+```{r update-records}
+# Update some of those records
+queried_records <- queried_records %>%
+  mutate(FirstName = "TestTest") %>% 
+  select(-Account)
+
+updated_records <- dyn_update(queried_records, entity_name="account")
+updated_records
+```
+
+### Delete
+
+Records can easily be deleted individually or in bulk by passing a vector of IDs 
+to the `dyn_delete()` function. Here we will delete the two records that we created 
+in this example.
+
+```{r delete-records}
+deleted_records <- dyn_delete(updated_records$id)
+deleted_records
+```
