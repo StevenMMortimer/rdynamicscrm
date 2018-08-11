@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/build_soap_xml_from_list.html</loc>
-  </url>
-  <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/catch_errors.html</loc>
   </url>
   <url>
@@ -31,19 +28,10 @@
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/header_available.html</loc>
   </url>
   <url>
-    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/make_soap_xml_skeleton.html</loc>
-  </url>
-  <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/rdynamicscrm.html</loc>
   </url>
   <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/rdynamicscrm_state.html</loc>
-  </url>
-  <url>
-    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/xmlToList2.html</loc>
-  </url>
-  <url>
-    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/xml_nodeset_to_df.html</loc>
   </url>
   <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/articles/getting-started.html</loc>

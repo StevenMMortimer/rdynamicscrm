@@ -7,7 +7,7 @@
 #' username, and password.
 #'
 #' @importFrom uuid UUIDgenerate
-#' @importFrom base64enc base64encode base64decode
+#' @importFrom base64enc base64encode
 #' @importFrom digest digest hmac
 #' @importFrom httr GET POST add_headers status_code content
 #' @importFrom XML newXMLNode setXMLNamespace saveXML
