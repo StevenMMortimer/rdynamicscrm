@@ -13,5 +13,14 @@ test_that("testing happy path auth", {
                       password = password)
   
   expect_is(session, "list")
-  expect_named(session, c("binary_secret", "digest_value", "signature_value"))
+  expect_named(session, c("header",
+                          "url",
+                          "username",
+                          "password",
+                          "soap_path",
+                          "urn_address",
+                          "binary_secret",
+                          "key_identifier",
+                          "digest_value",
+                          "signature_value"))
 })

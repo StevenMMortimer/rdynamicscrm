@@ -42,6 +42,9 @@ get_os <- function(){
 
 #' Validate the input for an operation
 #' 
+#' @param input_data \code{named vector}, \code{matrix}, \code{data.frame}, or
+#' \code{tbl_df}; data can be coerced into a \code{data.frame}
+#' @template operation
 #' @note This function is meant to be used internally. Only use when debugging.
 #' @keywords internal
 #' @export

@@ -3,13 +3,13 @@
 #' An implementation of a MS Dynamics CRM client
 #'
 #' An implementation of a 'MS Dynamics CRM' client. Microsoft Dynamics CRM is a 
-#' customer relationship management (CRM) software package developed by Microsoft 
-#' \href{https://dynamics.microsoft.com/en-us/}. This package is an articulation of 
-#' SOAP API calls to a CRM Online and On Premise IFD environment.
+#' customer relationship management (CRM) software package developed by Microsoft. 
+#' This package is an articulation of SOAP API calls to a CRM Online and On Premise 
+#' IFD environment.
 #' 
 #' Additional material can be found in the 
 #' \href{https://github.com/StevenMMortimer/rdynamicscrm}{README} on GitHub
-#'
+#' 
 #' @docType package
 #' @name rdynamicscrm
 #' @importFrom dplyr %>%

@@ -1,3 +1,25 @@
+#' Extract Key-Value Pairs
+#' 
+#' This function extracts a series of key-value pairs into a single row tibble
+#' where each key is a column and the first row contains the value for each.
+#' 
+#' @importFrom purrr map_df 
+#' @importFrom dplyr as_tibble
+#' @importFrom tidyr spread
+#' @param node the XML node or document to be converted to an R list
+#' @return \code{list} parsed from the supplied node
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
+#' @export
+extract_key_value_data <- function(x){
+  lapply(x, FUN=function(y){
+    list(key=y$key[[1]], 
+         value=y$value[[1]])
+  }) %>%
+    map_df(as_tibble) %>%
+    spread(key, value)
+}
+
 #' xmlToList2
 #' 
 #' This function is an early and simple approach to converting an 
@@ -146,10 +168,8 @@ make_soap_xml_skeleton <- function(soap_headers=list(), metadata_ns=FALSE){
 #' @importFrom XML newXMLNode xmlValue<-
 #' @param input_data a \code{data.frame} of data to fill the XML body
 #' @template operation
-#' @template object_name
-#' @param fields character; one or more strings indicating the fields to be returned 
-#' on the records
-#' @template external_id_fieldname
+#' @template entity_name
+#' @template fields
 #' @param root_name character; the name of the root node if created
 #' @param ns named vector; a collection of character strings indicating the namespace 
 #' definitions of the root node if created
@@ -160,13 +180,10 @@ make_soap_xml_skeleton <- function(soap_headers=list(), metadata_ns=FALSE){
 #' @export
 build_soap_xml_from_list <- function(input_data,
                                      operation = c("create", "retrieve", 
-                                                   "update", "upsert", 
-                                                   "delete", "search", 
-                                                   "query", "queryMore", 
-                                                   "describeSObjects"),
-                                     object_name=NULL,
+                                                   "associate", "disassociate",
+                                                   "update", "delete", "retrievemultiple"),
+                                     entity_name=NULL,
                                      fields=NULL,
-                                     external_id_fieldname=NULL,
                                      root_name = NULL, 
                                      ns = c(character(0)),
                                      root = NULL){

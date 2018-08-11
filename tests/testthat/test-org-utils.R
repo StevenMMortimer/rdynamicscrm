@@ -7,6 +7,6 @@ dyn_auth(url = rdynamicscrm_setup$url,
 
 test_that("testing dyn_whoami()", {
   res <- dyn_whoami() 
-  expect_is(res, "list")
-  expect_true(all(c("id", "isActive", "firstName", "lastName", "email") %in% names(res)))
+  expect_is(res, "tbl_df")
+  expect_named(res, c("BusinessUnitId", "OrganizationId", "UserId"))
 })
