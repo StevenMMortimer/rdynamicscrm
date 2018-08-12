@@ -1,6 +1,6 @@
 context("Authorization")
 
-stop(paste0(list.files('../../'), collapse="|"))
+stop(paste0(list.files('../'), collapse="|"))
 
 rdynamicscrm_setup <- readRDS("rdynamicscrm_setup.rds")
 
