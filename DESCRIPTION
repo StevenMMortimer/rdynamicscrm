@@ -28,7 +28,8 @@ Imports:
     XML,
     digest,
     base64enc,
-    uuid
+    uuid,
+    readr
 Suggests:
     knitr,
     testthat,
