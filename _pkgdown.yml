@@ -46,4 +46,4 @@ reference:
   - title: MS Dynamics CRM Utility Functions
     desc: Functions used for basic calls to understand the organization
     contents:
-      - '`dyn_user_info`'
+      - '`dyn_whoami`'

@@ -107,7 +107,7 @@
 <p><br><img src="reference/figures/rdynamicscrm.png" width="120px" align="right"></p>
 <p><strong>rdynamicscrm</strong> is an R package that creates a client to connect to MS Dynamics CRM. Package features include:</p>
 <ul>
-<li>An auto-refreshing authentication method (<code><a href="reference/dyn_auth.html">dyn_auth()</a></code>)</li>
+<li>An auto-refreshing authentication method (<code>dyn_auth()</code>)</li>
 <li>CRUD (Create, Retrieve, Update, Delete) methods for records, such as:
 <ul>
 <li>
@@ -117,7 +117,7 @@
 </li>
 <li>Query records using <code>dyn_query()</code>
 </li>
-<li>Basic utility calls (<code><a href="reference/dyn_whoami.html">dyn_whoami()</a></code>)</li>
+<li>Basic utility calls (<code>dyn_whoami()</code>)</li>
 </ul>
 <div id="table-of-contents" class="section level2">
 <h2 class="hasAnchor">
@@ -158,15 +158,15 @@ devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocument
 <p>First, load the <strong>rdynamicscrm</strong> package and authenticate.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rdynamicscrm)
 
-<span class="kw"><a href="reference/dyn_auth.html">dyn_auth</a></span>(<span class="dt">url =</span> <span class="st">"https://test.ztcrm.org/"</span>,
+<span class="kw">dyn_auth</span>(<span class="dt">url =</span> <span class="st">"https://test.ztcrm.org/"</span>,
          <span class="dt">username =</span> <span class="st">"test@live.com"</span>, 
          <span class="dt">password =</span> <span class="st">"{PASSWORD_HERE}"</span>)</code></pre></div>
-<p>The <code><a href="reference/dyn_auth.html">dyn_auth()</a></code> function will obtain a cipher and secret key that will be embedded in the header of each SOAP API call to securely access the CRM instance. After obtaining these authentication credentials, you can check your connectivity by looking at the information returned about the current user. It should be information about you!</p>
+<p>The <code>dyn_auth()</code> function will obtain a cipher and secret key that will be embedded in the header of each SOAP API call to securely access the CRM instance. After obtaining these authentication credentials, you can check your connectivity by looking at the information returned about the current user. It should be information about you!</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pull down information of person logged in</span>
 <span class="co"># it's a simple easy call to get started </span>
 <span class="co"># and confirm a connection to the APIs</span>
-me &lt;-<span class="st"> </span><span class="kw"><a href="reference/dyn_whoami.html">dyn_whoami</a></span>()
-my_info &lt;-<span class="st"> </span><span class="kw"><a href="reference/dyn_retrieve.html">dyn_retrieve</a></span>(me<span class="op">$</span>UserId, <span class="dt">entity_name=</span><span class="st">"systemuser"</span>, 
+me &lt;-<span class="st"> </span><span class="kw">dyn_whoami</span>()
+my_info &lt;-<span class="st"> </span><span class="kw">dyn_retrieve</span>(me<span class="op">$</span>UserId, <span class="dt">entity_name=</span><span class="st">"systemuser"</span>, 
                         <span class="dt">columns=</span><span class="kw">c</span>(<span class="st">"fullname"</span>, <span class="st">"isdisabled"</span>))
 <span class="kw">sprintf</span>(<span class="st">"Name: %s"</span>, my_info<span class="op">$</span>fullname)
 <span class="kw">sprintf</span>(<span class="st">"Disabled?: %s"</span>, my_info<span class="op">$</span>isdisabled)</code></pre></div>

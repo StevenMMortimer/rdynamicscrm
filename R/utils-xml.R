@@ -25,7 +25,7 @@ extract_key_value_data <- function(x){
 #' This function swaps in a new header for a posted body. This is mainly needed 
 #' whenever the header expires and needs updated.
 #' 
-#' @importFrom XML xmlChildren xmlInternalTreeParse saveXML getNodeSet xmlValue xmlValue<-
+#' @importFrom XML xmlChildren xmlInternalTreeParse saveXML getNodeSet xmlValue xmlValue<- replaceNodes
 #' @importFrom dplyr as_tibble
 #' @importFrom tidyr spread
 #' @param node the XML node or document to be converted to an R list
@@ -47,6 +47,151 @@ update_header <- function(x){
   x <- saveXML(x, encoding = "UTF-8", indent=FALSE)
   return(x)
 }
+
+#' Create XML Node for Single Value 
+#' 
+#' This function takes a single value for a record and converts it to a valid XML 
+#' node with attribute type so that Dynamics CRM will recognize the type and value.
+#' 
+#' @importFrom XML newXMLNode
+#' @importFrom lubridate is.Date is.POSIXt as_datetime
+#' @param x value; a single column/attribute value from a record
+#' @return \code{xmlNode}
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
+#' @export
+gen_value_node <- function(x){
+  if(is.na(x)){
+    x <- newXMLNode("b:value",
+                    attrs = c(`i:nil`="true"), 
+                    namespaceDefinitions = c("b" = "http://schemas.datacontract.org/2004/07/System.Collections.Generic"), 
+                    suppressNamespaceWarning = TRUE)
+  } else if(is.character(x) & grepl("^[0-9A-Za-z-]{36}$", x)){
+    x <- newXMLNode("b:value", x,
+                    attrs = c(`i:type`="c:guid"),
+                    namespaceDefinitions = c("b" = "http://schemas.datacontract.org/2004/07/System.Collections.Generic", 
+                                             "c" = "http://schemas.microsoft.com/2003/10/Serialization/"), 
+                    suppressNamespaceWarning = TRUE)
+  } else if(is.character(x) & x %in% c("true", "false")){
+    x <- newXMLNode("b:value", x,
+                    attrs = c(`i:type`="d:boolean"),
+                    namespaceDefinitions = c("b" = "http://schemas.datacontract.org/2004/07/System.Collections.Generic", 
+                                             "d" = "http://www.w3.org/2001/XMLSchema"), 
+                    suppressNamespaceWarning = TRUE)
+  } else if(is.character(x)){
+    x <- newXMLNode("b:value", x,
+                    attrs = c(`i:type`="d:string"),
+                    namespaceDefinitions = c("b" = "http://schemas.datacontract.org/2004/07/System.Collections.Generic", 
+                                             "d" = "http://www.w3.org/2001/XMLSchema"), 
+                    suppressNamespaceWarning = TRUE)
+  } else if(is.Date(x) | is.POSIXt(x)){
+    x <- newXMLNode("b:value", format(as_datetime(x), "%Y-%m-%dT%H:%M:%SZ"),
+                    attrs = c(`i:type`="d:dateTime"),
+                    namespaceDefinitions = c("b" = "http://schemas.datacontract.org/2004/07/System.Collections.Generic", 
+                                             "d" = "http://www.w3.org/2001/XMLSchema"), 
+                    suppressNamespaceWarning = TRUE)
+  } else if(is.integer(x)){
+    x <- newXMLNode("b:value", x,
+                    attrs = c(`i:type`="d:int"),
+                    namespaceDefinitions = c("b" = "http://schemas.datacontract.org/2004/07/System.Collections.Generic", 
+                                             "d" = "http://www.w3.org/2001/XMLSchema"), 
+                    suppressNamespaceWarning = TRUE)
+  } else if(is.numeric(x)){
+    x <- newXMLNode("b:value", x,
+                    attrs = c(`i:type`="d:double"),
+                    namespaceDefinitions = c("b" = "http://schemas.datacontract.org/2004/07/System.Collections.Generic", 
+                                             "d" = "http://www.w3.org/2001/XMLSchema"), 
+                    suppressNamespaceWarning = TRUE)
+  } else if(is.logical(x)){
+    x <- newXMLNode("b:value", tolower(x),
+                    attrs = c(`i:type`="d:boolean"),
+                    namespaceDefinitions = c("b" = "http://schemas.datacontract.org/2004/07/System.Collections.Generic", 
+                                             "d" = "http://www.w3.org/2001/XMLSchema"), 
+                    suppressNamespaceWarning = TRUE)
+  } else {
+    stop("Did not match one of: `guid`, `string`, `double`, `int`, or `boolean`")
+  }
+  return(x)
+}
+
+#' Build Request Body for a Single Record
+#' 
+#' This function builds the XML body for a request to create or update a single record in 
+#' the specified entity.
+#' 
+#' @importFrom XML newXMLNode setXMLNamespace
+#' @importFrom stringr str_to_title
+#' @param input_data \code{named vector}, \code{matrix}, \code{data.frame}, or
+#' \code{tbl_df}; data can be coerced into a \code{data.frame}
+#' @template entity_name
+#' @template operation
+#' @return \code{XMLNode} to be used as the body for the request
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
+#' @export
+convert_entity_data_to_body <- function(input_data, entity_name, operation){
+  
+  if(!('id' %in% names(input_data))){
+    this_id <- "00000000-0000-0000-0000-000000000000"
+  } else {
+    this_id <- input_data$id[1]
+    # drop the id column
+    input_data <- input_data[,!(names(input_data) %in% c('id')),drop=FALSE]    
+  }
+  
+  body <- newXMLNode("s:Body")
+  requesttype <- newXMLNode("Execute", 
+                            namespaceDefinitions = c("http://schemas.microsoft.com/xrm/2011/Contracts/Services", 
+                                                     "i" = "http://www.w3.org/2001/XMLSchema-instance"), 
+                            parent=body)
+  operation <- str_to_title(operation)
+  request <- newXMLNode("request", 
+                        attrs = c(`i:type`=sprintf("a:%sRequest", operation)),
+                        namespaceDefinitions = c("a" = "http://schemas.microsoft.com/xrm/2011/Contracts"), 
+                        parent=requesttype)
+  parms <- newXMLNode("a:Parameters",
+                      namespaceDefinitions = c("b"="http://schemas.datacontract.org/2004/07/System.Collections.Generic"),
+                      parent=request)
+  kvp1 <- newXMLNode("a:KeyValuePairOfstringanyType", 
+                     newXMLNode("b:key", "Target"), 
+                     parent=parms)
+  val_node <- newXMLNode("b:value", 
+                         attrs = c(`i:type`="a:Entity"), 
+                         parent=kvp1)
+  attr_node <- newXMLNode("a:Attributes",
+                          parent=val_node)
+  
+  for(i in 1:ncol(input_data)){
+    this_node <- newXMLNode("a:KeyValuePairOfstringanyType", 
+                            newXMLNode("b:key", names(input_data)[i]),
+                            gen_value_node(input_data[1,i]),
+                            parent=attr_node)
+    invisible(setXMLNamespace(this_node, "a"))
+  }
+  id_node <- newXMLNode("a:Id", this_id,
+                        parent=val_node)
+  loginame_node <- newXMLNode("a:LogicalName", entity_name,
+                              parent=val_node)
+  
+  invisible(setXMLNamespace(kvp1, "a"))
+  invisible(setXMLNamespace(val_node, "b"))
+  invisible(setXMLNamespace(attr_node, "a"))
+  invisible(setXMLNamespace(id_node, "a"))
+  invisible(setXMLNamespace(loginame_node, "a"))
+  invisible(setXMLNamespace(parms, "a"))
+  
+  requestid <- newXMLNode("a:RequestId", attrs = c(`i:nil`="true"), 
+                          parent=request)
+  invisible(setXMLNamespace(requestid, "a"))
+  
+  requestname <- newXMLNode("a:RequestName", 
+                            operation,
+                            parent=request)
+  invisible(setXMLNamespace(requestname, "a"))
+  
+  return(body)
+}
+
 
 #' #' xmlToList2
 #' #' 

@@ -1,7 +1,7 @@
 Package: rdynamicscrm
 Title: An implementation of a 'MS Dynamics CRM' client
 Version: 0.0.0.9000
-Date: 2018-08-11
+Date: 2018-08-12
 Description: An implementation of a 'MS Dynamics CRM' client. Microsoft Dynamics 
     CRM is a customer relationship management (CRM) software package developed by 
     Microsoft <https://dynamics.microsoft.com/en-us/>. This package is an articulation 
@@ -20,6 +20,7 @@ Depends:
 License: MIT + file LICENSE
 LazyData: true
 Imports:
+    methods,
     httr,
     purrr,
     dplyr,
@@ -29,12 +30,14 @@ Imports:
     digest,
     base64enc,
     uuid,
-    readr
+    readr,
+    lubridate, 
+    stringr
 Suggests:
     knitr,
     testthat,
     rmarkdown,
     here,
-    lubridate
+    tibble
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1

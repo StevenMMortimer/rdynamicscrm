@@ -3,19 +3,27 @@
 #' Executes a query against the specified object and returns data that matches
 #' the specified criteria.
 #'
-#' @importFrom dplyr bind_rows as_tibble select matches contains rename_at
-#' @importFrom httr content
+#' @importFrom methods as
+#' @importFrom dplyr bind_rows
 #' @importFrom purrr map_df
+#' @importFrom httr POST content add_headers
 #' @importFrom readr type_convert cols
-#' @importFrom xml2 xml_find_first xml_find_all xml_text xml_ns_strip
+#' @importFrom xml2 xml_ns_strip xml_find_all xml_text as_list
+#' @importFrom XML newXMLNode setXMLNamespace xmlChildren xmlInternalTreeParse addChildren getNodeSet xmlValue<- saveXML xmlTextNode xmlParse
 #' @template fetchxml
 #' @template entity_name
-#' @param page_size numeric; a number between 200 and 2000 indicating the number of
-#' records per page that are returned. Speed benchmarks should be done to better
-#' understand the speed implications of choosing high or low values of this argument.
-#' @param next_records_url character (leave as NULL); a string used internally
-#' by the function to paginate through to more records until complete
+#' @template attributes
+#' @param all_attributes logical; an indicator if all possible attributes should be returned 
+#' for the entity. If \code{TRUE} this parameter will override the \code{attributes} parameter.
+#' @param page_size numeric; a number indicating the records per page that are 
+#' returned. This is provided for performance improvements for queries returning a 
+#' large number of records.
+#' @param top numeric; a number indicating the first N number of records that should 
+#' be returned by the query. This behavior is similar to the LIMIT or TOP keyword in SQL.
 #' @template verbose
+#' @note If the \code{fetchxml} argument is specified, then all other fetch arguments will 
+#' be ignored. They are only provided as a convenience in case the user does not want 
+#' to specify exact FetchXML for simple "SELECT" queries (e.g. SELECT * FROM ACCOUNT).
 #' @return \code{tbl_df} of records
 #' @examples
 #' \dontrun{
@@ -29,10 +37,28 @@
 #'   </entity>
 #' </fetch>"
 #' users <- dyn_query(fetchxml)
+#' 
+#' # using arguments instead of explicit FetchXML statement
+#' users <- dyn_query(entity_name="systemuser",
+#'                    attributes=c("fullname", "internalemailaddress"))
 #' }
 #' @export
-dyn_query <- function(fetchxml,
+dyn_query <- function(fetchxml=NULL,
+                      entity_name=NULL,
+                      attributes=NULL,
+                      all_attributes=FALSE,
+                      page_size=100,
+                      top=NULL,
                       verbose=FALSE){
+  
+  if(is.null(fetchxml)){
+    stopifnot(!is.null(entity_name), (!is.null(attributes) | all_attributes))
+    fetchxml <- generate_fetchxml(entity_name=entity_name, 
+                                  attributes=attributes, 
+                                  all_attributes=all_attributes,
+                                  page_size=page_size,
+                                  top=top)
+  }
   
   this_body <- newXMLNode("s:Body")
   requesttype <- newXMLNode("RetrieveMultiple", 

@@ -38,8 +38,8 @@ dyn_retrieve <- function(ids,
   ids <- dyn_input_data_validation(ids, operation='retrieve')
   
   resultset <- NULL
-  for(i in ids[1]){
-    this_body <- build_retrieve_id_body(id=i, 
+  for(i in 1:nrow(ids)){
+    this_body <- build_retrieve_id_body(id=ids$id[i], 
                                         entity_name=entity_name,
                                         columns=columns,
                                         all_columns=all_columns)

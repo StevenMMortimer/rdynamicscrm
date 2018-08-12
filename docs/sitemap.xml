@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/build_delete_id_body.html</loc>
+  </url>
+  <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/build_retrieve_id_body.html</loc>
   </url>
   <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/catch_errors.html</loc>
+  </url>
+  <url>
+    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/convert_entity_data_to_body.html</loc>
   </url>
   <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_auth.html</loc>
@@ -13,19 +19,37 @@
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_auth_refresh.html</loc>
   </url>
   <url>
+    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_create.html</loc>
+  </url>
+  <url>
+    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_delete.html</loc>
+  </url>
+  <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_header.html</loc>
   </url>
   <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_input_data_validation.html</loc>
   </url>
   <url>
+    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_query.html</loc>
+  </url>
+  <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_retrieve.html</loc>
+  </url>
+  <url>
+    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_update.html</loc>
   </url>
   <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_whoami.html</loc>
   </url>
   <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/extract_key_value_data.html</loc>
+  </url>
+  <url>
+    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/gen_value_node.html</loc>
+  </url>
+  <url>
+    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/generate_fetchxml.html</loc>
   </url>
   <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/get_os.html</loc>
@@ -38,6 +62,9 @@
   </url>
   <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/rdynamicscrm_state.html</loc>
+  </url>
+  <url>
+    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/update_header.html</loc>
   </url>
   <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/articles/getting-started.html</loc>
