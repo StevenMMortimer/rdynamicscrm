@@ -1,5 +1,7 @@
 context("Authorization")
 
+stop(paste0(list.files('../../'), collapse="|"))
+
 rdynamicscrm_setup <- readRDS("rdynamicscrm_setup.rds")
 
 test_that("testing happy path auth", {
