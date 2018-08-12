@@ -1,7 +1,5 @@
 context("Query & CRUD Operations")
 
-stop(paste0(list.files('../../rdynamicscrm'), collapse="|"))
-
 rdynamicscrm_setup <- readRDS("rdynamicscrm_setup.rds")
 dyn_auth(url = rdynamicscrm_setup$url, 
          username = rdynamicscrm_setup$username,

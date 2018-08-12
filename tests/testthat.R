@@ -1,6 +1,5 @@
 library(testthat)
 suppressWarnings(suppressMessages(library(dplyr)))
-suppressWarnings(suppressMessages(library(here)))
 suppressWarnings(suppressMessages(library(rdynamicscrm)))
 
 if (identical(tolower(Sys.getenv("NOT_CRAN")), "true") & 
