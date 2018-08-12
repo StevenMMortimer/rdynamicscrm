@@ -1,6 +1,8 @@
 before_install:
-- openssl aes-256-cbc -K $encrypted_ade8c2d962fb_key -iv $encrypted_ade8c2d962fb_iv -in tests/testthat/rdynamicscrm_setup.rds.enc -out tests/testthat/rdynamicscrm_setup.rds -d
-- R -q -e 'install.packages(c("remotes", "curl")); remotes::install_github("ropenscilabs/tic"); tic::prepare_all_stages(); tic::before_install()'
+- openssl aes-256-cbc -K $encrypted_8aaff3b2d04f_key -iv $encrypted_8aaff3b2d04f_iv
+  -in tests/testthat/rdynamicscrm_setup.rds.enc -out tests/testthat/rdynamicscrm_setup.rds -d
+- R -q -e 'install.packages(c("remotes", "curl")); remotes::install_github("ropenscilabs/tic");
+  tic::prepare_all_stages(); tic::before_install()'
 install: R -q -e 'tic::install()'
 after_install: R -q -e 'tic::after_install()'
 before_script: R -q -e 'tic::before_script()'

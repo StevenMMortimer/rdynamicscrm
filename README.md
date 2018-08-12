@@ -47,8 +47,6 @@ Usage
 First, load the **rdynamicscrm** package and authenticate.
 
 ``` r
-suppressWarnings(suppressMessages(library(dplyr)))
-suppressWarnings(suppressMessages(library(purrr)))
 library(rdynamicscrm)
 
 dyn_auth(url = "https://test.ztcrm.org/",
@@ -62,9 +60,11 @@ The `dyn_auth()` function will obtain a cipher and secret key that will be embed
 # pull down information of person logged in
 # it's a simple easy call to get started 
 # and confirm a connection to the APIs
-user_info <- dyn_whoami()
-sprintf("Name: %s %s", user_info$firstname, user_info$lastname)
-sprintf("User Active?: %s", user_info$isactive)
+me <- dyn_whoami()
+my_info <- dyn_retrieve(me$UserId, entity_name="systemuser", 
+                        columns=c("fullname", "isdisabled"))
+sprintf("Name: %s", my_info$fullname)
+sprintf("Disabled?: %s", my_info$isdisabled)
 ```
 
 ### Create

@@ -156,9 +156,7 @@ devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocument
 <h3 class="hasAnchor">
 <a href="#authenticate" class="anchor"></a>Authenticate</h3>
 <p>First, load the <strong>rdynamicscrm</strong> package and authenticate.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">suppressWarnings</span>(<span class="kw">suppressMessages</span>(<span class="kw">library</span>(dplyr)))
-<span class="kw">suppressWarnings</span>(<span class="kw">suppressMessages</span>(<span class="kw">library</span>(purrr)))
-<span class="kw">library</span>(rdynamicscrm)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rdynamicscrm)
 
 <span class="kw"><a href="reference/dyn_auth.html">dyn_auth</a></span>(<span class="dt">url =</span> <span class="st">"https://test.ztcrm.org/"</span>,
          <span class="dt">username =</span> <span class="st">"test@live.com"</span>, 
@@ -167,16 +165,18 @@ devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocument
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pull down information of person logged in</span>
 <span class="co"># it's a simple easy call to get started </span>
 <span class="co"># and confirm a connection to the APIs</span>
-user_info &lt;-<span class="st"> </span><span class="kw"><a href="reference/dyn_whoami.html">dyn_whoami</a></span>()
-<span class="kw">sprintf</span>(<span class="st">"Name: %s %s"</span>, user_info<span class="op">$</span>firstname, user_info<span class="op">$</span>lastname)
-<span class="kw">sprintf</span>(<span class="st">"User Active?: %s"</span>, user_info<span class="op">$</span>isactive)</code></pre></div>
+me &lt;-<span class="st"> </span><span class="kw"><a href="reference/dyn_whoami.html">dyn_whoami</a></span>()
+my_info &lt;-<span class="st"> </span><span class="kw"><a href="reference/dyn_retrieve.html">dyn_retrieve</a></span>(me<span class="op">$</span>UserId, <span class="dt">entity_name=</span><span class="st">"systemuser"</span>, 
+                        <span class="dt">columns=</span><span class="kw">c</span>(<span class="st">"fullname"</span>, <span class="st">"isdisabled"</span>))
+<span class="kw">sprintf</span>(<span class="st">"Name: %s"</span>, my_info<span class="op">$</span>fullname)
+<span class="kw">sprintf</span>(<span class="st">"Disabled?: %s"</span>, my_info<span class="op">$</span>isdisabled)</code></pre></div>
 </div>
 <div id="create" class="section level3">
 <h3 class="hasAnchor">
 <a href="#create" class="anchor"></a>Create</h3>
 <p>MS Dynamics CRM has entities and those entities contain records. One default entity is the “Account” entity. This example shows how to create two records in the Account entity.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="dv">2</span>
-new_accounts &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/reexports.html">tibble</a></span>(<span class="dt">FirstName =</span> <span class="kw">rep</span>(<span class="st">"Test"</span>, n),
+new_accounts &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">FirstName =</span> <span class="kw">rep</span>(<span class="st">"Test"</span>, n),
                        <span class="dt">LastName =</span> <span class="kw">paste0</span>(<span class="st">"Account-Create-"</span>, <span class="dv">1</span><span class="op">:</span>n))
 created_records &lt;-<span class="st"> </span><span class="kw">dyn_create</span>(new_accounts, <span class="dt">entity_name=</span><span class="st">"Account"</span>)
 created_records</code></pre></div>
@@ -198,8 +198,8 @@ queried_records</code></pre></div>
 <p>After creating records you can update them using <code>dyn_update()</code>. Updating a record requires you to pass the MS Dynamics CRM <code>Id</code> of the record. MS Dynamics CRM creates a GUID (globally unique identifier) on each record and uses that to know which record to attach the update information you provide. Simply include a field or column in your update dataset called “Id” and the information will be matched. Here is an example where we update each of the records we created earlier with a new first name called “TestTest”.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Update some of those records</span>
 queried_records &lt;-<span class="st"> </span>queried_records <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">FirstName =</span> <span class="st">"TestTest"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="op">-</span>Account)
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">FirstName =</span> <span class="st">"TestTest"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>Account)
 
 updated_records &lt;-<span class="st"> </span><span class="kw">dyn_update</span>(queried_records, <span class="dt">entity_name=</span><span class="st">"account"</span>)
 updated_records</code></pre></div>

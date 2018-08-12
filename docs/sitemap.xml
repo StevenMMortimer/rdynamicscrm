@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/build_retrieve_id_body.html</loc>
+  </url>
+  <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/catch_errors.html</loc>
   </url>
   <url>
@@ -14,6 +17,9 @@
   </url>
   <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_input_data_validation.html</loc>
+  </url>
+  <url>
+    <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_retrieve.html</loc>
   </url>
   <url>
     <loc>https://stevenmmortimer.github.io/rdynamicscrm/reference/dyn_whoami.html</loc>
