@@ -23,6 +23,7 @@ vignettes/*.pdf
 
 # credentials
 rdynamicscrm_setup.rds
+rdynamicscrm.tar
 
 # knitr and R markdown default cache directories
 /*_cache/
