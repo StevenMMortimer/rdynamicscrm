@@ -11,7 +11,7 @@ catch_errors <- function(x, retry=TRUE){
     if(status_code(x) == 500){
       error_code <- response_parsed %>% 
         xml_ns_strip() %>%
-        xml_find_all("s:Body//s:Fault//s:Code//s:Subcode//s:Value") %>%
+        xml_find_all("s:Body//s:Fault//s:Code//s:Value") %>%
         xml_text()
       error_text <- response_parsed %>% 
         xml_ns_strip() %>%
@@ -29,7 +29,7 @@ catch_errors <- function(x, retry=TRUE){
         }
         catch_errors(x, retry=FALSE) # retry=FALSE prevents infinite looping if we can't re-authenticate
       } else {
-        message(response_parsed)
+        message(sprintf("%s: %s", error_code, error_text))
         stop()
       }
     } else {

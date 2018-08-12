@@ -13,8 +13,8 @@
 #' @export
 extract_key_value_data <- function(x){
   lapply(x, FUN=function(y){
-    list(key=y$key[[1]], 
-         value=y$value[[1]])
+    list(key=unlist(y)[1], 
+         value=unlist(y)[2])
   }) %>%
     map_df(as_tibble) %>%
     spread(key, value)

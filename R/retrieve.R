@@ -1,91 +1,145 @@
-#' #' Retrieve Records By Id
-#' #' 
-#' #' Retrieves one or more new records to your organization’s data.
-#' #' 
-#' #' @importFrom utils head 
-#' #' @importFrom stats quantile 
-#' #' @importFrom dplyr bind_rows as_tibble select matches rename_at starts_with
-#' #' @importFrom httr content
-#' #' @importFrom purrr map_df
-#' #' @importFrom readr type_convert cols
-#' #' @importFrom xml2 xml_find_first xml_find_all xml_text xml_ns_strip
-#' #' @param ids \code{vector}, \code{matrix}, \code{data.frame}, or 
-#' #' \code{tbl_df}; if not a vector, there must be a column called Id (case-insensitive) 
-#' #' that can be passed in the request
-#' #' @param fields character; one or more strings indicating the fields to be returned 
-#' #' on the records
-#' #' @template entity_name
-#' #' @template verbose
-#' #' @return \code{tibble}
-#' #' @examples
-#' #' \dontrun{
-#' #' n <- 2
-#' #' new_contacts <- tibble(FirstName = rep("Test", n),
-#' #'                        LastName = paste0("Contact", 1:n))
-#' #' new_contacts_result <- dyn_create(new_contacts, entity_name="Contact")
-#' #' retrieved_records <- dyn_retrieve(ids=new_contacts_result$id,
-#' #'                                   fields=c("FirstName", "LastName"),
-#' #'                                   entity_name="Contact")
-#' #' }
-#' #' @export
-#' dyn_retrieve <- function(ids,
-#'                          fields,
-#'                          entity_name,
-#'                          verbose = FALSE){
-#'   
-#'   ids <- dyn_input_data_validation(ids, operation='retrieve')
-#'   # limit this type of request to only 200 records at a time to prevent 
-#'   # the XML from exceeding a size limit
-#'   batch_size <- 200
-#'   row_num <- nrow(ids)
-#'   batch_id <- (seq.int(row_num)-1) %/% batch_size
-#'   if(verbose) message("Submitting data in ", max(batch_id)+1, " Batches")
-#'   message_flag <- unique(as.integer(quantile(0:max(batch_id), c(0.25,0.5,0.75,1))))
-#'   
-#'   base_soap_url <- make_base_soap_url()
-#'   if(verbose) {
-#'     message(base_soap_url)
-#'   }
-#'   
-#'   resultset <- NULL
-#'   for(batch in seq(0, max(batch_id))){
-#'     
-#'     if(verbose){
-#'       batch_msg_flg <- batch %in% message_flag
-#'       if(batch_msg_flg){
-#'         message(paste0("Processing Batch # ", head(batch, 1) + 1))
-#'       } 
-#'     }
-#'     
-#'     batched_data <- ids[batch_id == batch, , drop=FALSE]  
-#'     r <- make_soap_xml_skeleton()
-#'     xml_dat <- build_soap_xml_from_list(input_data = batched_data,
-#'                                         operation = "retrieve",
-#'                                         object_name = object_name,
-#'                                         fields = fields,
-#'                                         root=r)
-#'     httr_response <- rPOST(url = base_soap_url,
-#'                            headers = c("SOAPAction"="retrieve",
-#'                                        "Content-Type"="text/xml"),
-#'                            body = as(xml_dat, "character"))
-#'     catch_errors(httr_response)
-#'     response_parsed <- content(httr_response, encoding="UTF-8")
-#'     this_set <- response_parsed %>%
-#'       xml_ns_strip() %>%
-#'       xml_find_all('.//result')
-#'     if(length(this_set) > 0){
-#'       this_set <- this_set %>%
-#'         map_df(xml_nodeset_to_df) %>%
-#'         select(-matches("sf:type")) %>%
-#'         rename_at(.vars = vars(starts_with("sf:")), 
-#'                   .funs = funs(gsub("^sf:", "", .))) %>%
-#'         select(-matches("Id1"))
-#'     } else {
-#'       this_set <- NULL
-#'     }
-#'     resultset <- bind_rows(resultset, this_set)
-#'   }
-#'   resultset <- resultset %>% 
-#'     type_convert(col_types = cols())
-#'   return(resultset)
+#' Retrieve Records By Id
+#'
+#' Retrieves one or more new records to your organization’s data.
+#'
+#' @importFrom dplyr bind_rows
+#' @importFrom httr POST content
+#' @importFrom purrr map_df
+#' @importFrom readr type_convert cols
+#' @importFrom XML setXMLNamespace xmlInternalTreeParse xmlChildren addChildren getNodeSet xmlValue<- saveXML
+#' @importFrom xml2 xml_ns_strip xml_find_all as_list
+#' @param ids \code{vector}, \code{matrix}, \code{data.frame}, or
+#' \code{tbl_df}; if not a vector, there must be a column called Id (case-insensitive)
+#' that can be passed in the request
+#' @template entity_name
+#' @template columns
+#' @param all_columns logical; an indicator if all possible columns should be returned 
+#' for the entity. If \code{TRUE} this parameter will override the \code{columns} parameter.
+#' @template verbose
+#' @return \code{tibble}
+#' @examples
+#' \dontrun{
+#' me <- dyn_whoami()
+#' dyn_retrieve(me$UserId, entity_name="systemuser", 
+#'              columns=c("firstname", "lastname"))
+#' dyn_retrieve(me$UserId, entity_name="systemuser", all_columns=TRUE)            
 #' }
+#' @export
+dyn_retrieve <- function(ids,
+                         entity_name,
+                         columns,
+                         all_columns = FALSE,
+                         verbose = FALSE){
+  
+  if(missing(columns) & !all_columns){
+    stop("`columns` argument is missing. Either specify `columns` or set `all_columns`=TRUE")
+  }
+
+  ids <- dyn_input_data_validation(ids, operation='retrieve')
+  
+  resultset <- NULL
+  for(i in ids[1]){
+    this_body <- build_retrieve_id_body(id=i, 
+                                        entity_name=entity_name,
+                                        columns=columns,
+                                        all_columns=all_columns)
+    this_request <- xmlChildren(xmlInternalTreeParse(.state$header))$Envelope
+    this_request <- addChildren(this_request, this_body)
+    nodes <- getNodeSet(this_request, "//s:Header//a:Action")
+    xmlValue(nodes[[1]]) <- paste0("http://schemas.microsoft.com/xrm/2011/Contracts/Services/IOrganizationService/", 
+                                   "Execute")
+    this_request <- saveXML(this_request, encoding = "UTF-8", indent=FALSE)
+    
+    httr_response <- POST(url = .state$urn_address,
+                          add_headers(`Content-Type` = "application/soap+xml; charset=UTF-8"),
+                          body = this_request)
+    catch_errors(httr_response)
+    parsed <- content(httr_response, as="parsed", type="text/xml", encoding="UTF-8")
+    
+    this_res <- parsed %>% 
+      xml_ns_strip() %>%
+      xml_find_all("s:Body//ExecuteResponse//ExecuteResult//b:Results//b:Attributes") %>% 
+      as_list() %>%
+      map_df(extract_key_value_data)
+    
+    resultset <- bind_rows(resultset, this_res)
+  }
+  
+  resultset <- resultset %>%
+    type_convert(col_types = cols())
+  
+  return(resultset)
+}
+
+
+#' Build Request Body for Retrieve by Id
+#' 
+#' This function builds the XML body for a request to retrieve an entity by Id.
+#' 
+#' @importFrom XML newXMLNode setXMLNamespace addChildren
+#' @param id character; a MS Dynamics CRM generated id
+#' @template entity_name
+#' @template columns
+#' @param all_columns logical; an indicator if all possible columns should be returned 
+#' for the entity. If \code{TRUE} this parameter will override the \code{columns} parameter.
+#' @return \code{XMLNode} to be used as the body for the request
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
+#' @export
+build_retrieve_id_body <- function(id, entity_name, columns, all_columns){
+  body <- newXMLNode("s:Body")
+  requesttype <- newXMLNode("Execute", 
+                            namespaceDefinitions = c("http://schemas.microsoft.com/xrm/2011/Contracts/Services", 
+                                                     "i" = "http://www.w3.org/2001/XMLSchema-instance"), 
+                            parent=body)
+  request <- newXMLNode("request", 
+                        attrs = c(`i:type`="a:RetrieveRequest"),
+                        namespaceDefinitions = c("a" = "http://schemas.microsoft.com/xrm/2011/Contracts"), 
+                        parent=requesttype)
+  parms <- newXMLNode("a:Parameters",
+                      namespaceDefinitions = c("b"="http://schemas.datacontract.org/2004/07/System.Collections.Generic"),
+                      parent=request)
+  kvp1 <- newXMLNode("a:KeyValuePairOfstringanyType", 
+                     newXMLNode("b:key", "Target"), 
+                     newXMLNode("b:value", 
+                                attrs = c(`i:type`="a:EntityReference"),
+                                newXMLNode("a:Id", id), 
+                                newXMLNode("a:LogicalName", entity_name),
+                                newXMLNode("a:Name", attrs = c(`i:nil`="true"), 
+                                           suppressNamespaceWarning = TRUE), 
+                                suppressNamespaceWarning = TRUE),
+                     parent=parms)
+  kvp2 <- newXMLNode("a:KeyValuePairOfstringanyType", 
+                     newXMLNode("b:key", "ColumnSet"), 
+                     parent=parms)
+  kvp2_val <- newXMLNode("b:value", 
+                         attrs = c(`i:type`="a:ColumnSet"),
+                         newXMLNode("a:AllColumns", tolower(all_columns)), 
+                         parent=kvp2)
+  cols_node <- newXMLNode("a:Columns", 
+                          namespaceDefinitions = c("a" = "http://schemas.microsoft.com/xrm/2011/Contracts", 
+                                                   "c"="http://schemas.microsoft.com/2003/10/Serialization/Arrays"),
+                          parent=kvp2_val)
+  
+  if(!all_columns){
+    for(c in columns){
+      invisible(addChildren(cols_node, newXMLNode("c:string", c)))
+    }
+  }
+  
+  invisible(setXMLNamespace(cols_node, "a"))
+  invisible(setXMLNamespace(kvp2_val, "b"))
+  invisible(setXMLNamespace(kvp1, "a"))
+  invisible(setXMLNamespace(kvp2, "a"))
+  invisible(setXMLNamespace(parms, "a"))
+  requestid <- newXMLNode("a:RequestId", 
+                          attrs = c(`i:nil`="true"), 
+                          parent=request)
+  invisible(setXMLNamespace(requestid, "a"))
+  requestname <- newXMLNode("a:RequestName", 
+                            "Retrieve",
+                            parent=request)
+  invisible(setXMLNamespace(requestname, "a"))
+  
+  return(body)
+}
