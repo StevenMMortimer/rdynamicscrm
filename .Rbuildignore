@@ -18,5 +18,4 @@
 ^tic\.R$
 man-roxygen
 tests/testthat/rdynamicscrm_setup.rds.enc
-tests/testthat/rdynamicscrm_setup.rds
 tests/testthat/package.zip
