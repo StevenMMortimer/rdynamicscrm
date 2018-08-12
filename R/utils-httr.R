@@ -20,9 +20,10 @@ catch_errors <- function(x, retry=TRUE){
       if(retry & error_text == "An error occurred when verifying security for the message."){
         dyn_auth_refresh()
         if(x$request$options$post){
+          this_body <- update_header(rawToChar(x$request$options$postfields))
           x <- POST(x$request$url, 
                     add_headers(x$request$headers),
-                    body = rawToChar(x$request$options$postfields))
+                    body = this_body)
         } else {
           message(sprintf("%s: %s", error_code, error_text))
           stop()

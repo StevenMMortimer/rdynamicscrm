@@ -20,6 +20,34 @@ extract_key_value_data <- function(x){
     spread(key, value)
 }
 
+#' Update the Header of a Call
+#' 
+#' This function swaps in a new header for a posted body. This is mainly needed 
+#' whenever the header expires and needs updated.
+#' 
+#' @importFrom XML xmlChildren xmlInternalTreeParse saveXML getNodeSet xmlValue xmlValue<-
+#' @importFrom dplyr as_tibble
+#' @importFrom tidyr spread
+#' @param node the XML node or document to be converted to an R list
+#' @return \code{list} parsed from the supplied node
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
+#' @export
+update_header <- function(x){
+  new_header <- xmlChildren(xmlInternalTreeParse(.state$header))$Envelope
+  new_header_header <- getNodeSet(new_header, "//s:Header")
+  x <- xmlChildren(xmlInternalTreeParse(x))$Envelope
+  x_header <- getNodeSet(x, "//s:Header")
+  original_action <- xmlValue(getNodeSet(x, "//s:Header//a:Action")[[1]])
+  # swap in the new header
+  invisible(replaceNodes(x_header[[1]], new_header_header[[1]]))
+  # put back the original action
+  nodes <- getNodeSet(x, "//s:Header//a:Action")
+  xmlValue(nodes[[1]]) <- original_action
+  x <- saveXML(x, encoding = "UTF-8", indent=FALSE)
+  return(x)
+}
+
 #' #' xmlToList2
 #' #' 
 #' #' This function is an early and simple approach to converting an 
