@@ -201,7 +201,7 @@ as they are explained better there.
 More information is also available on the `pkgdown` site at 
 https://StevenMMortimer.github.io/rdynamicscrm.  
 
-[Top](#rdynamicscrm.)
+[Top](#rdynamicscrm)
 
 ---
 Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md).
