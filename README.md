@@ -62,9 +62,8 @@ The `dyn_auth()` function will obtain a cipher and secret key that will be embed
 # and confirm a connection to the APIs
 me <- dyn_whoami()
 my_info <- dyn_retrieve(me$UserId, entity_name="systemuser", 
-                        columns=c("fullname", "isdisabled"))
-sprintf("Name: %s", my_info$fullname)
-#> [1] "Name: Huddle User"
+                        attributes=c("fullname", "isdisabled"))
+#sprintf("Name: %s", my_info$fullname)
 sprintf("Disabled?: %s", my_info$isdisabled)
 #> [1] "Disabled?: false"
 ```
@@ -82,8 +81,8 @@ created_records
 #> # A tibble: 2 x 3
 #>   id                                   success error_msg
 #>   <chr>                                <lgl>   <chr>    
-#> 1 ab064e1c-f09e-e811-80e9-001dd8b75c2b TRUE    <NA>     
-#> 2 ae064e1c-f09e-e811-80e9-001dd8b75c2b TRUE    <NA>
+#> 1 1f2a025c-f49e-e811-80e9-001dd8b75c2b TRUE    <NA>     
+#> 2 222a025c-f49e-e811-80e9-001dd8b75c2b TRUE    <NA>
 ```
 
 ### Query
@@ -118,6 +117,12 @@ my_fetchxml <- '<fetch version="1.0" output-format="xml-platform" mapping="logic
                   </entity>
                 </fetch>'  
 queried_records <- dyn_query(fetchxml=my_fetchxml)
+queried_records
+#> # A tibble: 2 x 3
+#>   contactid                            firstname lastname        
+#>   <chr>                                <chr>     <chr>           
+#> 1 1f2a025c-f49e-e811-80e9-001dd8b75c2b Test      Contact-Create-1
+#> 2 222a025c-f49e-e811-80e9-001dd8b75c2b Test      Contact-Create-2
 ```
 
 ### Update
@@ -135,8 +140,8 @@ updated_records
 #> # A tibble: 2 x 3
 #>   id                                   success error_msg
 #>   <chr>                                <lgl>   <chr>    
-#> 1 ab064e1c-f09e-e811-80e9-001dd8b75c2b TRUE    <NA>     
-#> 2 ae064e1c-f09e-e811-80e9-001dd8b75c2b TRUE    <NA>
+#> 1 1f2a025c-f49e-e811-80e9-001dd8b75c2b TRUE    <NA>     
+#> 2 222a025c-f49e-e811-80e9-001dd8b75c2b TRUE    <NA>
 ```
 
 ### Delete
@@ -150,8 +155,8 @@ deleted_records
 #> # A tibble: 2 x 3
 #>   id                                   success error_msg
 #>   <chr>                                <lgl>   <chr>    
-#> 1 ab064e1c-f09e-e811-80e9-001dd8b75c2b TRUE    <NA>     
-#> 2 ae064e1c-f09e-e811-80e9-001dd8b75c2b TRUE    <NA>
+#> 1 1f2a025c-f49e-e811-80e9-001dd8b75c2b TRUE    <NA>     
+#> 2 222a025c-f49e-e811-80e9-001dd8b75c2b TRUE    <NA>
 ```
 
 Future
