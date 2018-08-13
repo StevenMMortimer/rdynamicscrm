@@ -64,32 +64,60 @@ me <- dyn_whoami()
 my_info <- dyn_retrieve(me$UserId, entity_name="systemuser", 
                         columns=c("fullname", "isdisabled"))
 sprintf("Name: %s", my_info$fullname)
+#> [1] "Name: Huddle User"
 sprintf("Disabled?: %s", my_info$isdisabled)
+#> [1] "Disabled?: false"
 ```
 
 ### Create
 
-MS Dynamics CRM has entities and those entities contain records. One default entity is the "Account" entity. This example shows how to create two records in the Account entity.
+MS Dynamics CRM has entities and those entities contain records. One default entity is the "contact" entity. This example shows how to create two records in the contact entity.
 
 ``` r
 n <- 2
-new_accounts <- tibble(FirstName = rep("Test", n),
-                       LastName = paste0("Account-Create-", 1:n))
-created_records <- dyn_create(new_accounts, entity_name="Account")
+new_contacts <- tibble(firstname = rep("Test", n),
+                       lastname = paste0("Contact-Create-", 1:n))
+created_records <- dyn_create(new_contacts, entity_name="contact")
 created_records
+#> # A tibble: 2 x 3
+#>   id                                   success error_msg
+#>   <chr>                                <lgl>   <chr>    
+#> 1 ab064e1c-f09e-e811-80e9-001dd8b75c2b TRUE    <NA>     
+#> 2 ae064e1c-f09e-e811-80e9-001dd8b75c2b TRUE    <NA>
 ```
 
 ### Query
 
-MS Dynamics CRM has proprietary form of SQL called FetchXML. FetchXML is a powerful tool that allows you to return the attributes of records on almost any entity in MS Dynamics CRM including Accounts, Contacts, custom entities and more! Below is an example where we grab the two Account records we just created.
+MS Dynamics CRM has proprietary form of SQL called FetchXML. FetchXML is a powerful tool that allows you to return the attributes of records on almost any entity in MS Dynamics CRM including accounts, contacts, custom entities and more!
+
+For simple "SELECT" queries you only need to specify the entity and the fields.
 
 ``` r
-queried_records <- dyn_query(entity - "account")
+queried_records <- dyn_query(entity_name = "contact",
+                             attributes = c("modifiedon", "donotbulkemail"), top=3)
 queried_records
+#> # A tibble: 3 x 3
+#>   contactid                            donotbulkemail modifiedon         
+#>   <chr>                                <chr>          <dttm>             
+#> 1 de9c2055-e833-e211-8139-000c29e211a0 false          2012-11-21 14:33:17
+#> 2 e29c2055-e833-e211-8139-000c29e211a0 false          2012-11-21 14:33:17
+#> 3 e49c2055-e833-e211-8139-000c29e211a0 false          2012-11-21 14:33:17
+```
 
-# example using raw FetchXML
-queried_records <- dyn_query(fetchxml = my_fetchxml)
-queried_records
+Below is an example where we grab the two contact records we just created using FetchXML to specifically target those records.
+
+``` r
+my_fetchxml <- '<fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="false">
+                  <entity name="contact" >
+                    <attribute name="firstname" />
+                    <attribute name="lastname" />
+                    <filter type="or">
+                      <condition attribute="lastname" operator="eq" value="Contact-Create-1" />
+                      <condition attribute="lastname" operator="eq" value="Contact-Create-2" />
+                    </filter>
+                  </entity>
+                </fetch>'  
+queried_records <- dyn_query(fetchxml=my_fetchxml)
 ```
 
 ### Update
@@ -99,11 +127,16 @@ After creating records you can update them using `dyn_update()`. Updating a reco
 ``` r
 # Update some of those records
 queried_records <- queried_records %>%
-  mutate(FirstName = "TestTest") %>% 
-  select(-Account)
+  mutate(firstname = "TestTest") %>% 
+  rename(id=contactid)
 
-updated_records <- dyn_update(queried_records, entity_name="account")
+updated_records <- dyn_update(queried_records, entity_name="contact")
 updated_records
+#> # A tibble: 2 x 3
+#>   id                                   success error_msg
+#>   <chr>                                <lgl>   <chr>    
+#> 1 ab064e1c-f09e-e811-80e9-001dd8b75c2b TRUE    <NA>     
+#> 2 ae064e1c-f09e-e811-80e9-001dd8b75c2b TRUE    <NA>
 ```
 
 ### Delete
@@ -111,8 +144,14 @@ updated_records
 Records can easily be deleted individually or in bulk by passing a vector of IDs to the `dyn_delete()` function. Here we will delete the two records that we created in this example.
 
 ``` r
-deleted_records <- dyn_delete(updated_records$id)
+ids_to_delete <- updated_records$id
+deleted_records <- dyn_delete(ids_to_delete, entity_name="contact")
 deleted_records
+#> # A tibble: 2 x 3
+#>   id                                   success error_msg
+#>   <chr>                                <lgl>   <chr>    
+#> 1 ab064e1c-f09e-e811-80e9-001dd8b75c2b TRUE    <NA>     
+#> 2 ae064e1c-f09e-e811-80e9-001dd8b75c2b TRUE    <NA>
 ```
 
 Future

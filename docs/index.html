@@ -107,17 +107,17 @@
 <p><br><img src="reference/figures/rdynamicscrm.png" width="120px" align="right"></p>
 <p><strong>rdynamicscrm</strong> is an R package that creates a client to connect to MS Dynamics CRM. Package features include:</p>
 <ul>
-<li>An auto-refreshing authentication method (<code>dyn_auth()</code>)</li>
+<li>An auto-refreshing authentication method (<code><a href="reference/dyn_auth.html">dyn_auth()</a></code>)</li>
 <li>CRUD (Create, Retrieve, Update, Delete) methods for records, such as:
 <ul>
 <li>
-<code>dyn_create()</code>, <code>dyn_retreive()</code>, <code>dyn_update()</code>, <code>dyn_delete()</code>
+<code><a href="reference/dyn_create.html">dyn_create()</a></code>, <code>dyn_retreive()</code>, <code><a href="reference/dyn_update.html">dyn_update()</a></code>, <code><a href="reference/dyn_delete.html">dyn_delete()</a></code>
 </li>
 </ul>
 </li>
-<li>Query records using <code>dyn_query()</code>
+<li>Query records using <code><a href="reference/dyn_query.html">dyn_query()</a></code>
 </li>
-<li>Basic utility calls (<code>dyn_whoami()</code>)</li>
+<li>Basic utility calls (<code><a href="reference/dyn_whoami.html">dyn_whoami()</a></code>)</li>
 </ul>
 <div id="table-of-contents" class="section level2">
 <h2 class="hasAnchor">
@@ -158,58 +158,97 @@ devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocument
 <p>First, load the <strong>rdynamicscrm</strong> package and authenticate.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rdynamicscrm)
 
-<span class="kw">dyn_auth</span>(<span class="dt">url =</span> <span class="st">"https://test.ztcrm.org/"</span>,
+<span class="kw"><a href="reference/dyn_auth.html">dyn_auth</a></span>(<span class="dt">url =</span> <span class="st">"https://test.ztcrm.org/"</span>,
          <span class="dt">username =</span> <span class="st">"test@live.com"</span>, 
          <span class="dt">password =</span> <span class="st">"{PASSWORD_HERE}"</span>)</code></pre></div>
-<p>The <code>dyn_auth()</code> function will obtain a cipher and secret key that will be embedded in the header of each SOAP API call to securely access the CRM instance. After obtaining these authentication credentials, you can check your connectivity by looking at the information returned about the current user. It should be information about you!</p>
+<p>The <code><a href="reference/dyn_auth.html">dyn_auth()</a></code> function will obtain a cipher and secret key that will be embedded in the header of each SOAP API call to securely access the CRM instance. After obtaining these authentication credentials, you can check your connectivity by looking at the information returned about the current user. It should be information about you!</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pull down information of person logged in</span>
 <span class="co"># it's a simple easy call to get started </span>
 <span class="co"># and confirm a connection to the APIs</span>
-me &lt;-<span class="st"> </span><span class="kw">dyn_whoami</span>()
-my_info &lt;-<span class="st"> </span><span class="kw">dyn_retrieve</span>(me<span class="op">$</span>UserId, <span class="dt">entity_name=</span><span class="st">"systemuser"</span>, 
-                        <span class="dt">columns=</span><span class="kw">c</span>(<span class="st">"fullname"</span>, <span class="st">"isdisabled"</span>))
-<span class="kw">sprintf</span>(<span class="st">"Name: %s"</span>, my_info<span class="op">$</span>fullname)
-<span class="kw">sprintf</span>(<span class="st">"Disabled?: %s"</span>, my_info<span class="op">$</span>isdisabled)</code></pre></div>
+me &lt;-<span class="st"> </span><span class="kw"><a href="reference/dyn_whoami.html">dyn_whoami</a></span>()
+my_info &lt;-<span class="st"> </span><span class="kw"><a href="reference/dyn_retrieve.html">dyn_retrieve</a></span>(me<span class="op">$</span>UserId, <span class="dt">entity_name=</span><span class="st">"systemuser"</span>, 
+                        <span class="dt">attributes=</span><span class="kw">c</span>(<span class="st">"fullname"</span>, <span class="st">"isdisabled"</span>))
+<span class="co">#sprintf("Name: %s", my_info$fullname)</span>
+<span class="kw">sprintf</span>(<span class="st">"Disabled?: %s"</span>, my_info<span class="op">$</span>isdisabled)
+<span class="co">#&gt; [1] "Disabled?: false"</span></code></pre></div>
 </div>
 <div id="create" class="section level3">
 <h3 class="hasAnchor">
 <a href="#create" class="anchor"></a>Create</h3>
-<p>MS Dynamics CRM has entities and those entities contain records. One default entity is the “Account” entity. This example shows how to create two records in the Account entity.</p>
+<p>MS Dynamics CRM has entities and those entities contain records. One default entity is the “contact” entity. This example shows how to create two records in the contact entity.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="dv">2</span>
-new_accounts &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">FirstName =</span> <span class="kw">rep</span>(<span class="st">"Test"</span>, n),
-                       <span class="dt">LastName =</span> <span class="kw">paste0</span>(<span class="st">"Account-Create-"</span>, <span class="dv">1</span><span class="op">:</span>n))
-created_records &lt;-<span class="st"> </span><span class="kw">dyn_create</span>(new_accounts, <span class="dt">entity_name=</span><span class="st">"Account"</span>)
-created_records</code></pre></div>
+new_contacts &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">firstname =</span> <span class="kw">rep</span>(<span class="st">"Test"</span>, n),
+                       <span class="dt">lastname =</span> <span class="kw">paste0</span>(<span class="st">"Contact-Create-"</span>, <span class="dv">1</span><span class="op">:</span>n))
+created_records &lt;-<span class="st"> </span><span class="kw"><a href="reference/dyn_create.html">dyn_create</a></span>(new_contacts, <span class="dt">entity_name=</span><span class="st">"contact"</span>)
+created_records
+<span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt;   id                                   success error_msg</span>
+<span class="co">#&gt;   &lt;chr&gt;                                &lt;lgl&gt;   &lt;chr&gt;    </span>
+<span class="co">#&gt; 1 09081c93-f19e-e811-80e9-001dd8b75c2b TRUE    &lt;NA&gt;     </span>
+<span class="co">#&gt; 2 0c081c93-f19e-e811-80e9-001dd8b75c2b TRUE    &lt;NA&gt;</span></code></pre></div>
 </div>
 <div id="query" class="section level3">
 <h3 class="hasAnchor">
 <a href="#query" class="anchor"></a>Query</h3>
-<p>MS Dynamics CRM has proprietary form of SQL called FetchXML. FetchXML is a powerful tool that allows you to return the attributes of records on almost any entity in MS Dynamics CRM including Accounts, Contacts, custom entities and more! Below is an example where we grab the two Account records we just created.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">queried_records &lt;-<span class="st"> </span><span class="kw">dyn_query</span>(entity <span class="op">-</span><span class="st"> "account"</span>)
+<p>MS Dynamics CRM has proprietary form of SQL called FetchXML. FetchXML is a powerful tool that allows you to return the attributes of records on almost any entity in MS Dynamics CRM including accounts, contacts, custom entities and more!</p>
+<p>For simple “SELECT” queries you only need to specify the entity and the fields.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">queried_records &lt;-<span class="st"> </span><span class="kw"><a href="reference/dyn_query.html">dyn_query</a></span>(<span class="dt">entity_name =</span> <span class="st">"contact"</span>,
+                             <span class="dt">attributes =</span> <span class="kw">c</span>(<span class="st">"modifiedon"</span>, <span class="st">"donotbulkemail"</span>), <span class="dt">top=</span><span class="dv">3</span>)
 queried_records
-
-<span class="co"># example using raw FetchXML</span>
-queried_records &lt;-<span class="st"> </span><span class="kw">dyn_query</span>(<span class="dt">fetchxml =</span> my_fetchxml)
-queried_records</code></pre></div>
+<span class="co">#&gt; # A tibble: 3 x 3</span>
+<span class="co">#&gt;   contactid                            donotbulkemail modifiedon         </span>
+<span class="co">#&gt;   &lt;chr&gt;                                &lt;chr&gt;          &lt;dttm&gt;             </span>
+<span class="co">#&gt; 1 de9c2055-e833-e211-8139-000c29e211a0 false          2012-11-21 14:33:17</span>
+<span class="co">#&gt; 2 e29c2055-e833-e211-8139-000c29e211a0 false          2012-11-21 14:33:17</span>
+<span class="co">#&gt; 3 e49c2055-e833-e211-8139-000c29e211a0 false          2012-11-21 14:33:17</span></code></pre></div>
+<p>Below is an example where we grab the two contact records we just created using FetchXML to specifically target those records.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_fetchxml &lt;-<span class="st"> '&lt;fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="false"&gt;</span>
+<span class="st">                  &lt;entity name="contact" &gt;</span>
+<span class="st">                    &lt;attribute name="firstname" /&gt;</span>
+<span class="st">                    &lt;attribute name="lastname" /&gt;</span>
+<span class="st">                    &lt;filter type="or"&gt;</span>
+<span class="st">                      &lt;condition attribute="lastname" operator="eq" value="Contact-Create-1" /&gt;</span>
+<span class="st">                      &lt;condition attribute="lastname" operator="eq" value="Contact-Create-2" /&gt;</span>
+<span class="st">                    &lt;/filter&gt;</span>
+<span class="st">                  &lt;/entity&gt;</span>
+<span class="st">                &lt;/fetch&gt;'</span>  
+queried_records &lt;-<span class="st"> </span><span class="kw"><a href="reference/dyn_query.html">dyn_query</a></span>(<span class="dt">fetchxml=</span>my_fetchxml)
+queried_records
+<span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt;   contactid                            firstname lastname        </span>
+<span class="co">#&gt;   &lt;chr&gt;                                &lt;chr&gt;     &lt;chr&gt;           </span>
+<span class="co">#&gt; 1 09081c93-f19e-e811-80e9-001dd8b75c2b Test      Contact-Create-1</span>
+<span class="co">#&gt; 2 0c081c93-f19e-e811-80e9-001dd8b75c2b Test      Contact-Create-2</span></code></pre></div>
 </div>
 <div id="update" class="section level3">
 <h3 class="hasAnchor">
 <a href="#update" class="anchor"></a>Update</h3>
-<p>After creating records you can update them using <code>dyn_update()</code>. Updating a record requires you to pass the MS Dynamics CRM <code>Id</code> of the record. MS Dynamics CRM creates a GUID (globally unique identifier) on each record and uses that to know which record to attach the update information you provide. Simply include a field or column in your update dataset called “Id” and the information will be matched. Here is an example where we update each of the records we created earlier with a new first name called “TestTest”.</p>
+<p>After creating records you can update them using <code><a href="reference/dyn_update.html">dyn_update()</a></code>. Updating a record requires you to pass the MS Dynamics CRM <code>Id</code> of the record. MS Dynamics CRM creates a GUID (globally unique identifier) on each record and uses that to know which record to attach the update information you provide. Simply include a field or column in your update dataset called “Id” and the information will be matched. Here is an example where we update each of the records we created earlier with a new first name called “TestTest”.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Update some of those records</span>
 queried_records &lt;-<span class="st"> </span>queried_records <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">FirstName =</span> <span class="st">"TestTest"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>Account)
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">firstname =</span> <span class="st">"TestTest"</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">rename</span>(<span class="dt">id=</span>contactid)
 
-updated_records &lt;-<span class="st"> </span><span class="kw">dyn_update</span>(queried_records, <span class="dt">entity_name=</span><span class="st">"account"</span>)
-updated_records</code></pre></div>
+updated_records &lt;-<span class="st"> </span><span class="kw"><a href="reference/dyn_update.html">dyn_update</a></span>(queried_records, <span class="dt">entity_name=</span><span class="st">"contact"</span>)
+updated_records
+<span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt;   id                                   success error_msg</span>
+<span class="co">#&gt;   &lt;chr&gt;                                &lt;lgl&gt;   &lt;chr&gt;    </span>
+<span class="co">#&gt; 1 09081c93-f19e-e811-80e9-001dd8b75c2b TRUE    &lt;NA&gt;     </span>
+<span class="co">#&gt; 2 0c081c93-f19e-e811-80e9-001dd8b75c2b TRUE    &lt;NA&gt;</span></code></pre></div>
 </div>
 <div id="delete" class="section level3">
 <h3 class="hasAnchor">
 <a href="#delete" class="anchor"></a>Delete</h3>
-<p>Records can easily be deleted individually or in bulk by passing a vector of IDs to the <code>dyn_delete()</code> function. Here we will delete the two records that we created in this example.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">deleted_records &lt;-<span class="st"> </span><span class="kw">dyn_delete</span>(updated_records<span class="op">$</span>id)
-deleted_records</code></pre></div>
+<p>Records can easily be deleted individually or in bulk by passing a vector of IDs to the <code><a href="reference/dyn_delete.html">dyn_delete()</a></code> function. Here we will delete the two records that we created in this example.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ids_to_delete &lt;-<span class="st"> </span>updated_records<span class="op">$</span>id
+deleted_records &lt;-<span class="st"> </span><span class="kw"><a href="reference/dyn_delete.html">dyn_delete</a></span>(ids_to_delete, <span class="dt">entity_name=</span><span class="st">"contact"</span>)
+deleted_records
+<span class="co">#&gt; # A tibble: 2 x 3</span>
+<span class="co">#&gt;   id                                   success error_msg</span>
+<span class="co">#&gt;   &lt;chr&gt;                                &lt;lgl&gt;   &lt;chr&gt;    </span>
+<span class="co">#&gt; 1 09081c93-f19e-e811-80e9-001dd8b75c2b TRUE    &lt;NA&gt;     </span>
+<span class="co">#&gt; 2 0c081c93-f19e-e811-80e9-001dd8b75c2b TRUE    &lt;NA&gt;</span></code></pre></div>
 </div>
 </div>
 <div id="future" class="section level2">

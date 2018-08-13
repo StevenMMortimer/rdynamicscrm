@@ -1,7 +1,7 @@
 ---
 title: "Getting Started"
 author: "Steven M. Mortimer"
-date: "2018-08-11"
+date: "2018-08-13"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -18,8 +18,7 @@ NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")), "true")
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  purl = NOT_CRAN,
-  eval = FALSE
+  purl = NOT_CRAN
 )
 ```
 
@@ -42,8 +41,10 @@ dyn_auth(url = "https://test.ztcrm.org/",
          password = "{PASSWORD_HERE}")
 ```
 
-After authenticating you can check your connectivity by looking at the information 
-returned about the current user. It should be information about you!
+The `dyn_auth()` function will obtain a cipher and secret key that will be embedded 
+in the header of each SOAP API call to securely access the CRM instance. After obtaining 
+these authentication credentials, you can check your connectivity by looking at 
+the information returned about the current user. It should be information about you!
 
 ```{r}
 # pull down information of person logged in
@@ -51,21 +52,21 @@ returned about the current user. It should be information about you!
 # and confirm a connection to the APIs
 me <- dyn_whoami()
 my_info <- dyn_retrieve(me$UserId, entity_name="systemuser", 
-                        columns=c("fullname", "isdisabled"))
-sprintf("Name: %s", my_info$fullname)
+                        attributes=c("fullname", "isdisabled"))
+#sprintf("Name: %s", my_info$fullname)
 sprintf("Disabled?: %s", my_info$isdisabled)
 ```
 
 ### Create
 
 MS Dynamics CRM has entities and those entities contain records. One default entity is the 
-"Account" entity. This example shows how to create two records in the Account entity.
+"contact" entity. This example shows how to create two records in the contact entity.
 
 ```{r create-records}
 n <- 2
-new_accounts <- tibble(FirstName = rep("Test", n),
-                       LastName = paste0("Account-Create-", 1:n))
-created_records <- dyn_create(new_accounts, entity_name="Account")
+new_contacts <- tibble(firstname = rep("Test", n),
+                       lastname = paste0("Contact-Create-", 1:n))
+created_records <- dyn_create(new_contacts, entity_name="contact")
 created_records
 ```
 
@@ -73,15 +74,31 @@ created_records
 
 MS Dynamics CRM has proprietary form of SQL called FetchXML. FetchXML is a powerful 
 tool that allows you to return the attributes of records on almost any entity in 
-MS Dynamics CRM including Accounts, Contacts, custom entities and more! Below is an 
-example where we grab the two Account records we just created.
+MS Dynamics CRM including accounts, contacts, custom entities and more! 
 
-```{r query-records}
-queried_records <- dyn_query(entity - "account")
+For simple "SELECT" queries you only need to specify the entity and the fields.
+
+```{r query-records-1}
+queried_records <- dyn_query(entity_name = "contact",
+                             attributes = c("modifiedon", "donotbulkemail"), top=3)
 queried_records
+```
 
-# example using raw FetchXML
-queried_records <- dyn_query(fetchxml = my_fetchxml)
+Below is an example where we grab the two contact records we just created using 
+FetchXML to specifically target those records.
+
+```{r query-records-2}
+my_fetchxml <- '<fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="false">
+                  <entity name="contact" >
+                    <attribute name="firstname" />
+                    <attribute name="lastname" />
+                    <filter type="or">
+                      <condition attribute="lastname" operator="eq" value="Contact-Create-1" />
+                      <condition attribute="lastname" operator="eq" value="Contact-Create-2" />
+                    </filter>
+                  </entity>
+                </fetch>'  
+queried_records <- dyn_query(fetchxml=my_fetchxml)
 queried_records
 ```
 
@@ -98,10 +115,10 @@ called "TestTest".
 ```{r update-records}
 # Update some of those records
 queried_records <- queried_records %>%
-  mutate(FirstName = "TestTest") %>% 
-  select(-Account)
+  mutate(firstname = "TestTest") %>% 
+  rename(id=contactid)
 
-updated_records <- dyn_update(queried_records, entity_name="account")
+updated_records <- dyn_update(queried_records, entity_name="contact")
 updated_records
 ```
 
@@ -112,6 +129,7 @@ to the `dyn_delete()` function. Here we will delete the two records that we crea
 in this example.
 
 ```{r delete-records}
-deleted_records <- dyn_delete(updated_records$id)
+ids_to_delete <- updated_records$id
+deleted_records <- dyn_delete(ids_to_delete, entity_name="contact")
 deleted_records
 ```

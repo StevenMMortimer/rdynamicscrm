@@ -135,7 +135,7 @@
     <p>This function builds the XML body for a request to retrieve an entity by Id.</p>
     
 
-    <pre class="usage"><span class='fu'>build_retrieve_id_body</span>(<span class='no'>id</span>, <span class='no'>entity_name</span>, <span class='no'>columns</span>, <span class='no'>all_columns</span>)</pre>
+    <pre class="usage"><span class='fu'>build_retrieve_id_body</span>(<span class='no'>id</span>, <span class='no'>entity_name</span>, <span class='no'>attributes</span>, <span class='no'>all_attributes</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -150,13 +150,13 @@
 function is operating against (e.g. "Account", "Contact", "CustomObject__c")</p></td>
     </tr>
     <tr>
-      <th>columns</th>
-      <td><p>character; one or more strings indicating columns</p></td>
+      <th>attributes</th>
+      <td><p>character; one or more strings indicating attributes</p></td>
     </tr>
     <tr>
-      <th>all_columns</th>
-      <td><p>logical; an indicator if all possible columns should be returned 
-for the entity. If <code>TRUE</code> this parameter will override the <code>columns</code> parameter.</p></td>
+      <th>all_attributes</th>
+      <td><p>logical; an indicator if all possible attributes should be returned 
+for the entity. If <code>TRUE</code> this parameter will override the <code>attributes</code> parameter.</p></td>
     </tr>
     </table>
     

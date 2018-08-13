@@ -12,27 +12,27 @@
 #' \code{tbl_df}; if not a vector, there must be a column called Id (case-insensitive)
 #' that can be passed in the request
 #' @template entity_name
-#' @template columns
-#' @param all_columns logical; an indicator if all possible columns should be returned 
-#' for the entity. If \code{TRUE} this parameter will override the \code{columns} parameter.
+#' @template attributes
+#' @param all_attributes logical; an indicator if all possible attributes should be returned 
+#' for the entity. If \code{TRUE} this parameter will override the \code{attributes} parameter.
 #' @template verbose
 #' @return \code{tibble}
 #' @examples
 #' \dontrun{
 #' me <- dyn_whoami()
 #' dyn_retrieve(me$UserId, entity_name="systemuser", 
-#'              columns=c("firstname", "lastname"))
-#' dyn_retrieve(me$UserId, entity_name="systemuser", all_columns=TRUE)            
+#'              attributes=c("firstname", "lastname"))
+#' dyn_retrieve(me$UserId, entity_name="systemuser", all_attributes=TRUE)            
 #' }
 #' @export
 dyn_retrieve <- function(ids,
                          entity_name,
-                         columns,
-                         all_columns = FALSE,
+                         attributes,
+                         all_attributes = FALSE,
                          verbose = FALSE){
   
-  if(missing(columns) & !all_columns){
-    stop("`columns` argument is missing. Either specify `columns` or set `all_columns`=TRUE")
+  if(missing(attributes) & !all_attributes){
+    stop("`attributes` argument is missing. Either specify `attributes` or set `all_attributes`=TRUE")
   }
 
   ids <- dyn_input_data_validation(ids, operation='retrieve')
@@ -41,8 +41,8 @@ dyn_retrieve <- function(ids,
   for(i in 1:nrow(ids)){
     this_body <- build_retrieve_id_body(id=ids$id[i], 
                                         entity_name=entity_name,
-                                        columns=columns,
-                                        all_columns=all_columns)
+                                        attributes=attributes,
+                                        all_attributes=all_attributes)
     this_request <- xmlChildren(xmlInternalTreeParse(.state$header))$Envelope
     this_request <- addChildren(this_request, this_body)
     nodes <- getNodeSet(this_request, "//s:Header//a:Action")
@@ -79,14 +79,14 @@ dyn_retrieve <- function(ids,
 #' @importFrom XML newXMLNode setXMLNamespace addChildren
 #' @param id character; a MS Dynamics CRM generated id
 #' @template entity_name
-#' @template columns
-#' @param all_columns logical; an indicator if all possible columns should be returned 
-#' for the entity. If \code{TRUE} this parameter will override the \code{columns} parameter.
+#' @template attributes
+#' @param all_attributes logical; an indicator if all possible attributes should be returned 
+#' for the entity. If \code{TRUE} this parameter will override the \code{attributes} parameter.
 #' @return \code{XMLNode} to be used as the body for the request
 #' @note This function is meant to be used internally. Only use when debugging.
 #' @keywords internal
 #' @export
-build_retrieve_id_body <- function(id, entity_name, columns, all_columns){
+build_retrieve_id_body <- function(id, entity_name, attributes, all_attributes){
   body <- newXMLNode("s:Body")
   requesttype <- newXMLNode("Execute", 
                             namespaceDefinitions = c("http://schemas.microsoft.com/xrm/2011/Contracts/Services", 
@@ -114,16 +114,16 @@ build_retrieve_id_body <- function(id, entity_name, columns, all_columns){
                      parent=parms)
   kvp2_val <- newXMLNode("b:value", 
                          attrs = c(`i:type`="a:ColumnSet"),
-                         newXMLNode("a:AllColumns", tolower(all_columns)), 
+                         newXMLNode("a:AllColumns", tolower(all_attributes)), 
                          parent=kvp2)
   cols_node <- newXMLNode("a:Columns", 
                           namespaceDefinitions = c("a" = "http://schemas.microsoft.com/xrm/2011/Contracts", 
                                                    "c"="http://schemas.microsoft.com/2003/10/Serialization/Arrays"),
                           parent=kvp2_val)
   
-  if(!all_columns){
-    for(c in columns){
-      invisible(addChildren(cols_node, newXMLNode("c:string", c)))
+  if(!all_attributes){
+    for(a in attributes){
+      invisible(addChildren(cols_node, newXMLNode("c:string", a)))
     }
   }
   

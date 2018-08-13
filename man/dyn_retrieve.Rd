@@ -4,7 +4,7 @@
 \alias{dyn_retrieve}
 \title{Retrieve Records By Id}
 \usage{
-dyn_retrieve(ids, entity_name, columns, all_columns = FALSE,
+dyn_retrieve(ids, entity_name, attributes, all_attributes = FALSE,
   verbose = FALSE)
 }
 \arguments{
@@ -15,10 +15,10 @@ that can be passed in the request}
 \item{entity_name}{character; the name of one MS Dynamics CRM entity that the 
 function is operating against (e.g. "Account", "Contact", "CustomObject__c")}
 
-\item{columns}{character; one or more strings indicating columns}
+\item{attributes}{character; one or more strings indicating attributes}
 
-\item{all_columns}{logical; an indicator if all possible columns should be returned 
-for the entity. If \code{TRUE} this parameter will override the \code{columns} parameter.}
+\item{all_attributes}{logical; an indicator if all possible attributes should be returned 
+for the entity. If \code{TRUE} this parameter will override the \code{attributes} parameter.}
 
 \item{verbose}{logical; do you want informative messages?}
 }
@@ -32,7 +32,7 @@ Retrieves one or more new records to your organization’s data.
 \dontrun{
 me <- dyn_whoami()
 dyn_retrieve(me$UserId, entity_name="systemuser", 
-             columns=c("firstname", "lastname"))
-dyn_retrieve(me$UserId, entity_name="systemuser", all_columns=TRUE)            
+             attributes=c("firstname", "lastname"))
+dyn_retrieve(me$UserId, entity_name="systemuser", all_attributes=TRUE)            
 }
 }

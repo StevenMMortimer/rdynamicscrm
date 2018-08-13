@@ -167,7 +167,7 @@ function is operating against (e.g. "Account", "Contact", "CustomObject__c")</p>
 <span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>2</span>
 <span class='no'>new_contacts</span> <span class='kw'>&lt;-</span> <span class='fu'>tibble</span>(<span class='kw'>firstname</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='st'>"Test"</span>, <span class='no'>n</span>),
                        <span class='kw'>lastname</span> <span class='kw'>=</span> <span class='fu'>paste0</span>(<span class='st'>"Contact"</span>, <span class='fl'>1</span>:<span class='no'>n</span>))
-<span class='no'>new_contacts_result1</span> <span class='kw'>&lt;-</span> <span class='fu'>dyn_create</span>(<span class='no'>new_contacts</span>, <span class='kw'>entity_name</span><span class='kw'>=</span><span class='st'>"contact"</span>)
+<span class='no'>new_contacts_result1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='dyn_create.html'>dyn_create</a></span>(<span class='no'>new_contacts</span>, <span class='kw'>entity_name</span><span class='kw'>=</span><span class='st'>"contact"</span>)
 <span class='no'>deleted_contacts_result1</span> <span class='kw'>&lt;-</span> <span class='fu'>dyn_delete</span>(<span class='no'>new_contacts_result1</span>$<span class='no'>id</span>,
                                        <span class='kw'>entity_name</span><span class='kw'>=</span><span class='st'>"contact"</span>)
 <span class='co'># }</span></pre>

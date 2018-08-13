@@ -4,7 +4,7 @@
 \alias{build_retrieve_id_body}
 \title{Build Request Body for Retrieve by Id}
 \usage{
-build_retrieve_id_body(id, entity_name, columns, all_columns)
+build_retrieve_id_body(id, entity_name, attributes, all_attributes)
 }
 \arguments{
 \item{id}{character; a MS Dynamics CRM generated id}
@@ -12,10 +12,10 @@ build_retrieve_id_body(id, entity_name, columns, all_columns)
 \item{entity_name}{character; the name of one MS Dynamics CRM entity that the 
 function is operating against (e.g. "Account", "Contact", "CustomObject__c")}
 
-\item{columns}{character; one or more strings indicating columns}
+\item{attributes}{character; one or more strings indicating attributes}
 
-\item{all_columns}{logical; an indicator if all possible columns should be returned 
-for the entity. If \code{TRUE} this parameter will override the \code{columns} parameter.}
+\item{all_attributes}{logical; an indicator if all possible attributes should be returned 
+for the entity. If \code{TRUE} this parameter will override the \code{attributes} parameter.}
 }
 \value{
 \code{XMLNode} to be used as the body for the request
