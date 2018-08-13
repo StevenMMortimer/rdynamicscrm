@@ -1,4 +1,4 @@
-## rdynamicscrm 0.0.0.9000
+## rdynamicscrm 0.0.1 [release](https://github.com/StevenMMortimer/rdynamicscrm/releases/tag/v0.0.1)
 
 ### Features
 

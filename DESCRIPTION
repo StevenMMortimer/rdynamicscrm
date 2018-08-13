@@ -1,7 +1,7 @@
 Package: rdynamicscrm
-Title: An implementation of a 'MS Dynamics CRM' client
-Version: 0.0.0.9000
-Date: 2018-08-12
+Title: An Implementation of a 'MS Dynamics CRM' Client
+Version: 0.0.1
+Date: 2018-08-13
 Description: An implementation of a 'MS Dynamics CRM' client. Microsoft Dynamics 
     CRM is a customer relationship management (CRM) software package developed by 
     Microsoft <https://dynamics.microsoft.com/en-us/>. This package is an articulation 
