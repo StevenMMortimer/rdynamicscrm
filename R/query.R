@@ -114,16 +114,16 @@ dyn_query <- function(fetchxml=NULL,
       xmlTextNode() %>% 
       as(., "character")
 
-    page <- gsub("(.*)page='([0-9]+)'(.*)", "\\2", fetchxml)
+    page <- gsub("(.*)page=\"([0-9]+)\"(.*)", "\\2", fetchxml)
     page <- as.integer(page) + 1
-    fetchxml <- gsub("page='([0-9]+)'", sprintf("page='%s'", page), fetchxml)
+    fetchxml <- gsub("page=\"([0-9]+)\"", sprintf("page=\"%s\"", page), fetchxml)
     
-    if(grepl("(paging\\-cookie=')(.*)(&lt;/cookie&gt;')", fetchxml)){
-      fetchxml <- gsub("(.*)(paging\\-cookie=')(.*)(&lt;/cookie&gt;')(.*)", 
-                       paste0("\\1", "\\2", new_paging_cookie, "'\\5"), fetchxml)      
+    if(grepl("(paging\\-cookie=\")(.*)(&lt;/cookie&gt;\")", fetchxml)){
+      fetchxml <- gsub("(.*)(paging\\-cookie=\")(.*)(&lt;/cookie&gt;\")(.*)", 
+                       paste0("\\1", "\\2", new_paging_cookie, "\"\\5"), fetchxml)      
     } else {
-      fetchxml <- gsub("(.*)(page='[0-9]+')(.*)", 
-                       paste0("\\1", "\\2 ", sprintf("paging-cookie='%s'", new_paging_cookie), "\\3"), fetchxml)
+      fetchxml <- gsub("(.*)(page=\"[0-9]+\")(.*)", 
+                       paste0("\\1", "\\2 ", sprintf("paging-cookie=\"%s\"", new_paging_cookie), "\\3"), fetchxml)
     }
 
     next_records <- dyn_query(fetchxml=fetchxml)
