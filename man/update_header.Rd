@@ -4,13 +4,13 @@
 \alias{update_header}
 \title{Update the Header of a Call}
 \usage{
-update_header(x)
+update_header(doc)
 }
 \arguments{
-\item{node}{the XML node or document to be converted to an R list}
+\item{doc}{the XML node or document to be converted to an R list}
 }
 \value{
-\code{list} parsed from the supplied node
+an XML document as text
 }
 \description{
 This function swaps in a new header for a posted body. This is mainly needed 

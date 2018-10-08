@@ -5,7 +5,8 @@
 \title{Perform FetchXML Query}
 \usage{
 dyn_query(fetchxml = NULL, entity_name = NULL, attributes = NULL,
-  all_attributes = FALSE, page_size = 100, top = NULL, verbose = FALSE)
+  all_attributes = FALSE, page_size = 100, top = NULL,
+  verbose = FALSE)
 }
 \arguments{
 \item{fetchxml}{character; a string defining a FetchXML query}

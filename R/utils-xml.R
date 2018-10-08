@@ -4,7 +4,7 @@
 #' where each key is a column and the first row contains the value for each.
 #' 
 #' @importFrom purrr map_df 
-#' @importFrom dplyr as_tibble
+#' @importFrom dplyr as_tibble first last tibble
 #' @importFrom tidyr spread
 #' @param node the XML node or document to be converted to an R list
 #' @return \code{list} parsed from the supplied node
@@ -12,11 +12,36 @@
 #' @keywords internal
 #' @export
 extract_key_value_data <- function(x){
-  lapply(x, FUN=function(y){
-    list(key=unlist(y)[1], 
-         value=unlist(y)[2])
+  map_df(x, .f=function(y){
+    unlisted_dat <- unlist(y)
+    if(length(y$value) > 1){
+      if("value.LogicalName" %in% names(unlisted_dat)){
+        res <- tibble(key=c(unlisted_dat['key'],
+                            unlisted_dat['value.LogicalName']),
+                      value=c(unlisted_dat['value.Id'], 
+                              unlisted_dat['value.Name']))
+      } else {
+        if(unlisted_dat[3] %in% c("systemuser", "contact", "account")){
+          if(grepl("id$", unlisted_dat[1])){
+            unlisted_dat[3] <- gsub("id$", '', unlisted_dat[1])
+            
+          } else {
+            # add id to the end of the first key since it's usually an id
+            unlisted_dat[3] <- unlisted_dat[1]
+            unlisted_dat[1] <- paste0(unlisted_dat[1], 'id')
+          }
+        }
+        res <- tibble(key=c(unlisted_dat[1],
+                            unlisted_dat[3]),
+                      value=c(unlisted_dat[2], 
+                              unlisted_dat[4]))
+      }
+    } else {
+      res <- tibble(key=first(unlisted_dat),
+                    value=last(unlisted_dat))
+    }
+    return(res)
   }) %>%
-    map_df(as_tibble) %>%
     spread(key, value)
 }
 
@@ -28,24 +53,24 @@ extract_key_value_data <- function(x){
 #' @importFrom XML xmlChildren xmlInternalTreeParse saveXML getNodeSet xmlValue xmlValue<- replaceNodes
 #' @importFrom dplyr as_tibble
 #' @importFrom tidyr spread
-#' @param node the XML node or document to be converted to an R list
-#' @return \code{list} parsed from the supplied node
+#' @param doc the XML node or document to be converted to an R list
+#' @return an XML document as text
 #' @note This function is meant to be used internally. Only use when debugging.
 #' @keywords internal
 #' @export
-update_header <- function(x){
+update_header <- function(doc){
   new_header <- xmlChildren(xmlInternalTreeParse(.state$header))$Envelope
   new_header_header <- getNodeSet(new_header, "//s:Header")
-  x <- xmlChildren(xmlInternalTreeParse(x))$Envelope
-  x_header <- getNodeSet(x, "//s:Header")
-  original_action <- xmlValue(getNodeSet(x, "//s:Header//a:Action")[[1]])
+  doc <- xmlChildren(xmlInternalTreeParse(doc))$Envelope
+  doc_header <- getNodeSet(doc, "//s:Header")
+  original_action <- xmlValue(getNodeSet(doc, "//s:Header//a:Action")[[1]])
   # swap in the new header
-  invisible(replaceNodes(x_header[[1]], new_header_header[[1]]))
+  invisible(replaceNodes(doc_header[[1]], new_header_header[[1]]))
   # put back the original action
-  nodes <- getNodeSet(x, "//s:Header//a:Action")
+  nodes <- getNodeSet(doc, "//s:Header//a:Action")
   xmlValue(nodes[[1]]) <- original_action
-  x <- saveXML(x, encoding = "UTF-8", indent=FALSE)
-  return(x)
+  doc <- saveXML(doc, encoding = "UTF-8", indent=FALSE)
+  return(doc)
 }
 
 #' Create XML Node for Single Value 

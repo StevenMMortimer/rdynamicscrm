@@ -94,7 +94,7 @@ dyn_auth <- function(url = NULL,
   invisible(newXMLNode("trust:RequestType", 
                        "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Issue",
                        parent=requesttoken))
-  
+
   # send login request ---------------------------------------------------------
   
   body_text <- saveXML(envelope, encoding="UTF-8", indent=FALSE)
@@ -110,15 +110,18 @@ dyn_auth <- function(url = NULL,
     xml_ns_strip() %>%
     xml_find_all("s:Body//trust:RequestedProofToken//trust:BinarySecret") %>%
     xml_text()
+  
   key_identifier <- response_parsed %>% 
     xml_ns_strip() %>%
     xml_find_all("s:Body//trust:RequestedAttachedReference//o:KeyIdentifier") %>%
     xml_text()
+
   ciphervalue1 <- response_parsed %>% 
     xml_ns_strip() %>%
     xml_find_all("s:Body//trust:RequestedSecurityToken//xenc:EncryptedData//e:CipherValue") %>% 
     .[[1]] %>%
     xml_text()
+  
   ciphervalue2 <- response_parsed %>% 
     xml_ns_strip() %>%
     xml_find_all("s:Body//trust:RequestedSecurityToken//xenc:EncryptedData//e:CipherValue") %>% 
@@ -163,6 +166,7 @@ dyn_auth <- function(url = NULL,
                        urn_address,
                        attrs=c(`s:mustUnderstand`="1"),
                        parent=header))
+
   security <- newXMLNode("o:Security", 
                          namespaceDefinitions = c("o" = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"),
                          parent=header)
@@ -184,6 +188,7 @@ dyn_auth <- function(url = NULL,
   invisible(newXMLNode("xenc:EncryptionMethod", 
                        attrs = c("Algorithm" = "http://www.w3.org/2001/04/xmlenc#aes256-cbc"), 
                        parent=encdata))
+
   keyinfo <- newXMLNode("KeyInfo", 
                         namespaceDefinitions = c("http://www.w3.org/2000/09/xmldsig#"),
                         parent=encdata)
@@ -201,6 +206,7 @@ dyn_auth <- function(url = NULL,
   sectokenref <- newXMLNode("o:SecurityTokenReference", 
                             namespaceDefinitions = c(o="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"), 
                             parent=keyinfo2)
+
   invisible(newXMLNode("X509Data",
                        newXMLNode("X509IssuerSerial", 
                                   newXMLNode("X509IssuerName", "CN=Go Daddy Secure Certificate Authority - G2, OU=http://certs.godaddy.com/repository/, O=\"GoDaddy.com, Inc.\", L=Scottsdale, S=Arizona, C=US"),
@@ -215,7 +221,7 @@ dyn_auth <- function(url = NULL,
   invisible(setXMLNamespace(cipherval1node, "e"))
   invisible(setXMLNamespace(cipherdata1, "e"))
   invisible(setXMLNamespace(enckey, "e"))
-  
+
   invisible(newXMLNode("xenc:CipherData", 
                        newXMLNode("xenc:CipherValue", ciphervalue2), 
                        parent=encdata))
@@ -232,6 +238,7 @@ dyn_auth <- function(url = NULL,
   reference <- newXMLNode("Reference", 
                           attrs=c(`URI`="#_0"), 
                           parent=signedinfo)
+
   invisible(newXMLNode("Transforms", 
                        newXMLNode("Transform",
                                   attrs=c(`Algorithm`="http://www.w3.org/2001/10/xml-exc-c14n#")), 
@@ -245,6 +252,7 @@ dyn_auth <- function(url = NULL,
   invisible(newXMLNode("SignatureValue", signature_value, parent=signature))
   keyinfo3 <- newXMLNode("KeyInfo", 
                          parent=signature)
+
   sectokenref2 <- newXMLNode("o:SecurityTokenReference",
                              namespaceDefinitions = c("o" = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"),
                              parent=keyinfo3)
@@ -254,8 +262,10 @@ dyn_auth <- function(url = NULL,
                          parent=sectokenref2)
   invisible(setXMLNamespace(keyident, "o"))
   invisible(setXMLNamespace(sectokenref2, "o"))
+
   
-  # set the global .state variable
+  # set the global .state variable ---------------------------------------------
+  
   .state$header <- saveXML(header_w_envl, encoding = "UTF-8", indent=FALSE)
   .state$url <- url
   .state$username <- username

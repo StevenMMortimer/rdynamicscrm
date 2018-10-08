@@ -40,3 +40,33 @@ catch_errors <- function(x, retry=TRUE){
   }
   invisible(x)
 }
+
+#' @export
+catch_errors2 <- function(x){
+  retry <- FALSE
+  if(http_error(x)){
+    response_parsed <- content(x, as="parsed", type="text/xml", encoding="UTF-8")
+    if(status_code(x) == 500){
+      error_code <- response_parsed %>% 
+        xml_ns_strip() %>%
+        xml_find_all("s:Body//s:Fault//s:Code//s:Value") %>%
+        xml_text()
+      error_text <- response_parsed %>% 
+        xml_ns_strip() %>%
+        xml_find_all("s:Body//s:Fault//s:Reason//s:Text") %>%
+        xml_text()
+      if(error_text == "An error occurred when verifying security for the message."){
+        message('refreshing auth')
+        dyn_auth_refresh()
+        retry <- TRUE
+      } else {
+        message(sprintf("%s: %s", error_code, error_text))
+        stop()
+      }
+    } else {
+      message(response_parsed)
+      stop()
+    }
+  }
+  return(retry)
+}
