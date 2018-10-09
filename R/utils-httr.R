@@ -62,7 +62,7 @@ catch_errors2 <- function(x){
         xml_find_all("s:Body//s:Fault//s:Reason//s:Text") %>%
         xml_text()
       if(error_text == "An error occurred when verifying security for the message."){
-        message('refreshing auth')
+        message('Refreshing Authentication')
         dyn_auth_refresh()
         retry <- TRUE
       } else {
