@@ -4,7 +4,7 @@
 #' the specified criteria.
 #'
 #' @importFrom methods as
-#' @importFrom dplyr bind_rows
+#' @importFrom dplyr bind_rows mutate_all
 #' @importFrom purrr map_df
 #' @importFrom httr POST content add_headers
 #' @importFrom readr type_convert cols

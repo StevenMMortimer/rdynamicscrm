@@ -41,6 +41,12 @@ catch_errors <- function(x, retry=TRUE){
   invisible(x)
 }
 
+#' Another function to catch and print HTTP errors
+#'
+#' @importFrom httr content http_error status_code POST add_headers
+#' @importFrom xml2 xml_ns_strip xml_find_all xml_text
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
 #' @export
 catch_errors2 <- function(x){
   retry <- FALSE
