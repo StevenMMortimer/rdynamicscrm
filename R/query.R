@@ -9,7 +9,7 @@
 #' @importFrom httr POST content add_headers
 #' @importFrom readr type_convert cols
 #' @importFrom xml2 xml_ns_strip xml_find_all xml_text as_list
-#' @importFrom XML newXMLNode setXMLNamespace xmlChildren xmlInternalTreeParse xmlAttrs xmlAttrs<- xpathApply xmlToList addChildren getNodeSet xmlValue<- saveXML xmlTextNode xmlParse
+#' @importFrom XML newXMLNode setXMLNamespace xmlChildren xmlInternalTreeParse xmlAttrs xmlAttrs<- xpathApply xpathSApply xmlToList addChildren getNodeSet xmlValue<- saveXML xmlTextNode xmlParse
 #' @template fetchxml
 #' @template entity_name
 #' @template attributes
