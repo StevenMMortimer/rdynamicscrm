@@ -87,9 +87,6 @@ dyn_query <- function(fetchxml=NULL,
     has_next <- final_result$has_next
   }
   
-  all_dat <- all_dat %>% 
-    type_convert(col_types = cols())
-  
   return(all_dat)
 }
 
