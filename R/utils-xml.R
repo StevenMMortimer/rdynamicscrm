@@ -4,7 +4,7 @@
 #' where each key is a column and the first row contains the value for each.
 #' 
 #' @importFrom purrr map_df 
-#' @importFrom dplyr as_tibble first last tibble
+#' @importFrom dplyr as_tibble
 #' @importFrom tidyr spread
 #' @param node the XML node or document to be converted to an R list
 #' @return \code{list} parsed from the supplied node
@@ -16,10 +16,10 @@ extract_key_value_data <- function(x){
     unlisted_dat <- unlist(y)
     if(length(y$value) > 1){
       if("value.LogicalName" %in% names(unlisted_dat)){
-        res <- tibble(key=c(unlisted_dat['key'],
-                            unlisted_dat['value.LogicalName']),
-                      value=c(unlisted_dat['value.Id'], 
-                              unlisted_dat['value.Name']))
+        res <- data.frame(key=c(unlisted_dat['key'], unlisted_dat['value.LogicalName']),
+                          value=c(unlisted_dat['value.Id'], unlisted_dat['value.Name']), 
+                          stringsAsFactors = FALSE)
+                      
       } else {
         if(unlisted_dat[3] %in% c("systemuser", "contact", "account")){
           if(grepl("id$", unlisted_dat[1])){
@@ -31,17 +31,18 @@ extract_key_value_data <- function(x){
             unlisted_dat[1] <- paste0(unlisted_dat[1], 'id')
           }
         }
-        res <- tibble(key=c(unlisted_dat[1],
-                            unlisted_dat[3]),
-                      value=c(unlisted_dat[2], 
-                              unlisted_dat[4]))
+        res <- data.frame(key=c(unlisted_dat[1], unlisted_dat[3]),
+                          value=c(unlisted_dat[2], unlisted_dat[4]), 
+                          stringsAsFactors = FALSE)
       }
     } else {
-      res <- tibble(key=first(unlisted_dat),
-                    value=last(unlisted_dat))
+      res <- data.frame(key=head(unlisted_dat,1),
+                        value=tail(unlisted_dat,1), 
+                        stringsAsFactors = FALSE)
     }
     return(res)
   }) %>%
+    as_tibble() %>%
     spread(key, value)
 }
 
