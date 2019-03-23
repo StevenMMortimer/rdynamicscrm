@@ -31,6 +31,11 @@ extract_key_value_data <- function(x){
             unlisted_dat[1] <- paste0(unlisted_dat[1], 'id')
           }
         }
+        # add double check against duplicate names
+        if(unlisted_dat[1] == unlisted_dat[3]){
+          # add id to the end of the first key since it's usually an id
+          unlisted_dat[1] <- paste0(unlisted_dat[1], 'id')
+        }
         res <- data.frame(key=c(unlisted_dat[1], unlisted_dat[3]),
                           value=c(unlisted_dat[2], unlisted_dat[4]), 
                           stringsAsFactors = FALSE)
