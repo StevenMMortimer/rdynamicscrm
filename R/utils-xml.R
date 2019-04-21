@@ -13,36 +13,43 @@
 #' @export
 extract_key_value_data <- function(x){
   map_df(x, .f=function(y){
-    unlisted_dat <- unlist(y)
-    if(length(y$value) > 1){
-      if("value.LogicalName" %in% names(unlisted_dat)){
-        res <- data.frame(key=c(unlisted_dat['key'], unlisted_dat['value.LogicalName']),
-                          value=c(unlisted_dat['value.Id'], unlisted_dat['value.Name']), 
+    these_attrs <- attr(y$value, "type")
+    if(is.null(these_attrs)){
+      res <- data.frame(key = y$key, value = unlist(y$value), 
+                        stringsAsFactors = FALSE)
+    } else if(these_attrs == "b:AliasedValue"){
+      value_attr <- attr(y$value[[3]], "type")
+      if(is.null(value_attr)){
+        res <- data.frame(key = y$key, value = unlist(y$value[[3]]), 
                           stringsAsFactors = FALSE)
-                      
-      } else {
-        if(unlisted_dat[3] %in% c("systemuser", "contact", "account")){
-          if(grepl("id$", unlisted_dat[1])){
-            unlisted_dat[3] <- gsub("id$", '', unlisted_dat[1])
-            
-          } else {
-            # add id to the end of the first key since it's usually an id
-            unlisted_dat[3] <- unlisted_dat[1]
-            unlisted_dat[1] <- paste0(unlisted_dat[1], 'id')
-          }
-        }
-        # add double check against duplicate names
-        if(unlisted_dat[1] == unlisted_dat[3]){
+      } else if(value_attr == "b:EntityReference"){
+        if(grepl("id$", y$key)){
+          y$value[[3]][[3]] <- gsub("id$", '', y$key)
+        } else {
           # add id to the end of the first key since it's usually an id
-          unlisted_dat[1] <- paste0(unlisted_dat[1], 'id')
+          y$key <- paste0(y$key, 'id')
+          y$value[[3]][[3]] <- gsub("id$", '', y$key)
         }
-        res <- data.frame(key=c(unlisted_dat[1], unlisted_dat[3]),
-                          value=c(unlisted_dat[2], unlisted_dat[4]), 
+        res <- data.frame(key = c(y$key, unlist(y$value[[3]][[3]])),
+                          value = c(y$value[[3]][[1]], unlist(y$value[[3]][[4]])), 
                           stringsAsFactors = FALSE)
+      } else {
+        res <- data.frame(key = y$key, value = unlist(y$value[[3]]), 
+                          stringsAsFactors = FALSE)        
       }
+    } else if(these_attrs == "b:EntityReference"){
+      if(grepl("id$", y$key)){
+        y$value[[3]] <- gsub("id$", '', y$key)
+      } else {
+        # add id to the end of the first key since it's usually an id
+        y$key <- paste0(y$key, 'id')
+        y$value[[3]] <- gsub("id$", '', y$key)
+      }
+      res <- data.frame(key = c(y$key, unlist(y$value[[3]])),
+                        value = c(y$value[[1]], unlist(y$value[[4]])), 
+                        stringsAsFactors = FALSE)
     } else {
-      res <- data.frame(key=head(unlisted_dat,1),
-                        value=tail(unlisted_dat,1), 
+      res <- data.frame(key = y$key, value = unlist(y$value), 
                         stringsAsFactors = FALSE)
     }
     return(res)
