@@ -115,8 +115,8 @@ dyn_query_once <- function(fetchxml, retry=FALSE, verbose=FALSE){
                         add_headers(`Content-Type` = "application/soap+xml; charset=UTF-8"),
                         body = this_request)
   
-  if(catch_errors2(httr_response) & retry){
-    final_result <- dyn_query_once(fetchxml=fetchxml, retry=FALSE)
+  if(catch_errors2(httr_response, verbose=verbose) & retry){
+    final_result <- dyn_query_once(fetchxml=fetchxml, retry=FALSE, verbose=verbose)
   } else {
     
     text_xml <- content(httr_response, as="text", type="text/xml", encoding="UTF-8")

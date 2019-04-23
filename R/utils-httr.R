@@ -5,7 +5,7 @@
 #' @note This function is meant to be used internally. Only use when debugging.
 #' @keywords internal
 #' @export
-catch_errors <- function(x, retry=TRUE){
+catch_errors <- function(x, retry=TRUE, verbose=FALSE){
   if(http_error(x)){
     response_parsed <- content(x, as="parsed", type="text/xml", encoding="UTF-8")
     if(status_code(x) == 500){
@@ -18,7 +18,7 @@ catch_errors <- function(x, retry=TRUE){
         xml_find_all("s:Body//s:Fault//s:Reason//s:Text") %>%
         xml_text()
       if(retry & error_text == "An error occurred when verifying security for the message."){
-        dyn_auth_refresh()
+        dyn_auth_refresh(verbose = verbose)
         if(x$request$options$post){
           this_body <- update_header(rawToChar(x$request$options$postfields))
           x <- POST(x$request$url, 
@@ -28,7 +28,7 @@ catch_errors <- function(x, retry=TRUE){
           message(sprintf("%s: %s", error_code, error_text))
           stop()
         }
-        catch_errors(x, retry=FALSE) # retry=FALSE prevents infinite looping if we can't re-authenticate
+        catch_errors(x, retry=FALSE, verbose = verbose) # retry=FALSE prevents infinite looping if we can't re-authenticate
       } else {
         message(sprintf("%s: %s", error_code, error_text))
         stop()
@@ -48,7 +48,7 @@ catch_errors <- function(x, retry=TRUE){
 #' @note This function is meant to be used internally. Only use when debugging.
 #' @keywords internal
 #' @export
-catch_errors2 <- function(x){
+catch_errors2 <- function(x, verbose=FALSE){
   retry <- FALSE
   if(http_error(x)){
     response_parsed <- content(x, as="parsed", type="text/xml", encoding="UTF-8")
@@ -62,8 +62,8 @@ catch_errors2 <- function(x){
         xml_find_all("s:Body//s:Fault//s:Reason//s:Text") %>%
         xml_text()
       if(error_text == "An error occurred when verifying security for the message."){
-        message('Refreshing Authentication')
-        dyn_auth_refresh()
+        if(verbose) message('Refreshing Authentication')
+        dyn_auth_refresh(verbose = verbose)
         retry <- TRUE
       } else {
         message(sprintf("%s: %s", error_code, error_text))
