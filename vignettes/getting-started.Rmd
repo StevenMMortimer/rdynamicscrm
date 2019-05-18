@@ -49,9 +49,8 @@ the information returned about the current user. It should be information about 
 # it's a simple easy call to get started 
 # and confirm a connection to the APIs
 me <- dyn_whoami()
-my_info <- dyn_retrieve(me$UserId, entity_name="systemuser", 
-                        attributes=c("fullname", "isdisabled"))
-#sprintf("Name: %s", my_info$fullname)
+my_info <- dyn_retrieve(me$UserId, entity_name = "systemuser", 
+                        all_attributes = TRUE)
 sprintf("Disabled?: %s", my_info$isdisabled)
 ```
 

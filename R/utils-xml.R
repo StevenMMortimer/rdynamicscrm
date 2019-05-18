@@ -17,7 +17,8 @@ extract_key_value_data <- function(x){
     if(is.null(these_attrs)){
       res <- data.frame(key = y$key, value = unlist(y$value), 
                         stringsAsFactors = FALSE)
-    } else if(these_attrs == "e:guid"){ 
+    } else if(these_attrs %in% c("e:guid", "d:guid", "d:boolean", "d:string", 
+                                 "d:int", "d:decimal", "d:dateTime", "d:date")){ 
       res <- data.frame(key = y$key[[1]][1], value = y$value[[1]][1], 
                         stringsAsFactors = FALSE)
     } else if(these_attrs == "b:AliasedValue"){
@@ -41,6 +42,10 @@ extract_key_value_data <- function(x){
                           stringsAsFactors = FALSE)        
       }
     } else if(these_attrs == "b:EntityReference"){
+      if(is.list(y$key)){
+        y$key <- y$key[[1]][1]
+        y$value[[1]] <- y$value[[1]][[1]][1]
+      }
       if(grepl("id$", y$key)){
         y$value[[3]] <- gsub("id$", '', y$key)
       } else {
@@ -50,6 +55,9 @@ extract_key_value_data <- function(x){
       }
       res <- data.frame(key = c(y$key, unlist(y$value[[3]])),
                         value = c(y$value[[1]], unlist(y$value[[4]])), 
+                        stringsAsFactors = FALSE)
+    } else if(these_attrs == "b:OptionSetValue"){
+      res <- data.frame(key = y$key[[1]][1], value = y$value[[1]][[1]][1], 
                         stringsAsFactors = FALSE)
     } else {
       res <- data.frame(key = y$key, value = unlist(y$value), 
