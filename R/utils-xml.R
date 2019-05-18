@@ -17,6 +17,9 @@ extract_key_value_data <- function(x){
     if(is.null(these_attrs)){
       res <- data.frame(key = y$key, value = unlist(y$value), 
                         stringsAsFactors = FALSE)
+    } else if(these_attrs == "e:guid"){ 
+      res <- data.frame(key = y$key[[1]][1], value = y$value[[1]][1], 
+                        stringsAsFactors = FALSE)
     } else if(these_attrs == "b:AliasedValue"){
       value_attr <- attr(y$value[[3]], "type")
       if(is.null(value_attr)){

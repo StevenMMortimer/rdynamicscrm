@@ -4,7 +4,7 @@
 \alias{catch_errors}
 \title{Function to catch and print HTTP errors}
 \usage{
-catch_errors(x, retry = TRUE)
+catch_errors(x, retry = TRUE, verbose = FALSE)
 }
 \description{
 Function to catch and print HTTP errors

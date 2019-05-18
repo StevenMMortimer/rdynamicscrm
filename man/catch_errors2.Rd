@@ -4,7 +4,7 @@
 \alias{catch_errors2}
 \title{Another function to catch and print HTTP errors}
 \usage{
-catch_errors2(x)
+catch_errors2(x, verbose = FALSE)
 }
 \description{
 Another function to catch and print HTTP errors

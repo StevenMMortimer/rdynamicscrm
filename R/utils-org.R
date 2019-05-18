@@ -16,7 +16,6 @@
 dyn_whoami <- function(){
   
   # build WhoIAm request body --------------------------------------------------
-  
   body <- newXMLNode("s:Body")
   requesttype <- newXMLNode("Execute", 
                             namespaceDefinitions = c("http://schemas.microsoft.com/xrm/2011/Contracts/Services"), 
