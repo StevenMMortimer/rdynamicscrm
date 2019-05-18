@@ -32,7 +32,8 @@ suppressMessages(dyn_auth(url = rdynamicscrm_setup$url,
                           password = rdynamicscrm_setup$password))
 ```
 
-```{r load-package, eval=FALSE}
+```{r load-package, eval=FALSE, message=FALSE, warning=FALSE}
+suppressMessages(suppressWarnings(library(dplyr)))
 library(rdynamicscrm)
 dyn_auth(url = "https://test.ztcrm.org/",
          username = "test@live.com", 
