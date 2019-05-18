@@ -25,6 +25,7 @@ knitr::opts_chunk$set(
 First, load the **rdynamicscrm** package and authenticate.
 
 ```{r auth, include = FALSE}
+suppressMessages(suppressWarnings(library(dplyr)))
 library(rdynamicscrm)
 rdynamicscrm_setup <- readRDS(here::here("tests", "testthat", "rdynamicscrm_setup.rds"))
 suppressMessages(dyn_auth(url = rdynamicscrm_setup$url, 
