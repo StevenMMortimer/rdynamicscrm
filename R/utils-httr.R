@@ -43,7 +43,7 @@ catch_errors <- function(x, retry=TRUE, verbose=FALSE){
 
 #' Another function to catch and print HTTP errors
 #'
-#' @importFrom httr content http_error status_code POST add_headers
+#' @importFrom httr content http_error status_code
 #' @importFrom xml2 xml_ns_strip xml_find_all xml_text
 #' @note This function is meant to be used internally. Only use when debugging.
 #' @keywords internal
@@ -75,4 +75,34 @@ catch_errors2 <- function(x, verbose=FALSE){
     }
   }
   return(retry)
+}
+
+#' Another function to catch and print HTTP errors
+#'
+#' @importFrom httr content http_error status_code
+#' @importFrom xml2 xml_ns_strip xml_find_all xml_text
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
+#' @export
+catch_errors_wo_retry <- function(x, verbose=FALSE){
+  retry <- FALSE
+  if(http_error(x)){
+    response_parsed <- content(x, as="parsed", type="text/xml", encoding="UTF-8")
+    if(status_code(x) == 500){
+      error_code <- response_parsed %>% 
+        xml_ns_strip() %>%
+        xml_find_all("s:Body//s:Fault//s:Code//s:Value") %>%
+        xml_text()
+      error_text <- response_parsed %>% 
+        xml_ns_strip() %>%
+        xml_find_all("s:Body//s:Fault//s:Reason//s:Text") %>%
+        xml_text()
+      message(sprintf("%s: %s", error_code, error_text))
+      stop()
+    } else {
+      message(response_parsed)
+      stop()
+    }
+  }
+  return(invisible(retry))
 }

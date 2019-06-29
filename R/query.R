@@ -118,7 +118,7 @@ dyn_query_once <- function(fetchxml, retry=FALSE, verbose=FALSE){
   if(catch_errors2(httr_response, verbose=verbose) & retry){
     final_result <- dyn_query_once(fetchxml=fetchxml, retry=FALSE, verbose=verbose)
   } else {
-    
+    catch_errors_wo_retry(httr_response)
     text_xml <- content(httr_response, as="text", type="text/xml", encoding="UTF-8")
     doc <- xmlParse(text_xml)
     resultset <- xpathApply(doc, "//b:Entity", fun=xmlToList, addAttributes = FALSE, 
