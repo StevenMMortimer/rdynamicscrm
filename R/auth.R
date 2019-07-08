@@ -105,7 +105,17 @@ dyn_auth <- function(url = NULL,
   response_parsed <- content(httr_response, as="parsed", type="text/xml", encoding="UTF-8")
   
   # define header constants ------------------------------------------------------
+
+  x509_issuer_name <- response_parsed %>% 
+    xml_ns_strip() %>%
+    xml_find_all("s:Body//trust:RequestedSecurityToken//KeyInfo//e:EncryptedKey//KeyInfo//o:SecurityTokenReference//X509Data//X509IssuerSerial//X509IssuerName") %>%
+    xml_text()
   
+  x509_serial_number <- response_parsed %>% 
+    xml_ns_strip() %>%
+    xml_find_all("s:Body//trust:RequestedSecurityToken//KeyInfo//e:EncryptedKey//KeyInfo//o:SecurityTokenReference//X509Data//X509IssuerSerial//X509SerialNumber") %>%
+    xml_text()
+    
   binary_secret <- response_parsed %>% 
     xml_ns_strip() %>%
     xml_find_all("s:Body//trust:RequestedProofToken//trust:BinarySecret") %>%
@@ -206,14 +216,12 @@ dyn_auth <- function(url = NULL,
   sectokenref <- newXMLNode("o:SecurityTokenReference", 
                             namespaceDefinitions = c(o="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"), 
                             parent=keyinfo2)
-
   invisible(newXMLNode("X509Data",
                        newXMLNode("X509IssuerSerial", 
-                                  newXMLNode("X509IssuerName", "CN=Go Daddy Secure Certificate Authority - G2, OU=http://certs.godaddy.com/repository/, O=\"GoDaddy.com, Inc.\", L=Scottsdale, S=Arizona, C=US"),
-                                  newXMLNode("X509SerialNumber", "543844728958466751")),
-                       parent=sectokenref))
-  cipherdata1 <- newXMLNode("e:CipherData", 
-                            parent=enckey)
+                                  newXMLNode("X509IssuerName", x509_issuer_name),
+                                  newXMLNode("X509SerialNumber", x509_serial_number)),
+                       parent = sectokenref))
+  cipherdata1 <- newXMLNode("e:CipherData", parent=enckey)
   cipherval1node <- newXMLNode("e:CipherValue", ciphervalue1) 
   invisible(addChildren(cipherdata1, cipherval1node))
   invisible(setXMLNamespace(sectokenref, "o"))
@@ -228,16 +236,16 @@ dyn_auth <- function(url = NULL,
   signature <- newXMLNode("Signature",
                           namespaceDefinitions = c("http://www.w3.org/2000/09/xmldsig#"), 
                           parent=security)
-  signedinfo <- newXMLNode("SignedInfo", parent=signature)
+  signedinfo <- newXMLNode("SignedInfo", parent = signature)
   invisible(newXMLNode("CanonicalizationMethod", 
                        attrs=c(`Algorithm`="http://www.w3.org/2001/10/xml-exc-c14n#"), 
                        parent=signedinfo))
   invisible(newXMLNode("SignatureMethod", 
-                       attrs=c(`Algorithm`="http://www.w3.org/2000/09/xmldsig#hmac-sha1"), 
-                       parent=signedinfo))
+                       attrs = c(`Algorithm`="http://www.w3.org/2000/09/xmldsig#hmac-sha1"), 
+                       parent = signedinfo))
   reference <- newXMLNode("Reference", 
-                          attrs=c(`URI`="#_0"), 
-                          parent=signedinfo)
+                          attrs = c(`URI`="#_0"), 
+                          parent = signedinfo)
 
   invisible(newXMLNode("Transforms", 
                        newXMLNode("Transform",
@@ -249,20 +257,18 @@ dyn_auth <- function(url = NULL,
   invisible(newXMLNode("DigestValue", 
                        digest_value,
                        parent=reference))
-  invisible(newXMLNode("SignatureValue", signature_value, parent=signature))
-  keyinfo3 <- newXMLNode("KeyInfo", 
-                         parent=signature)
+  invisible(newXMLNode("SignatureValue", signature_value, parent = signature))
+  keyinfo3 <- newXMLNode("KeyInfo", parent = signature)
 
   sectokenref2 <- newXMLNode("o:SecurityTokenReference",
                              namespaceDefinitions = c("o" = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"),
-                             parent=keyinfo3)
+                             parent = keyinfo3)
   keyident <- newXMLNode("o:KeyIdentifier", 
                          key_identifier,
                          attrs = c("ValueType" = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID"), 
-                         parent=sectokenref2)
+                         parent = sectokenref2)
   invisible(setXMLNamespace(keyident, "o"))
   invisible(setXMLNamespace(sectokenref2, "o"))
-
   
   # set the global .state variable ---------------------------------------------
   
